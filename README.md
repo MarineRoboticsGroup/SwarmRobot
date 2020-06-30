@@ -4,6 +4,31 @@ Background
 --------------
 
 Testing and implementing developed SLAM algorithms is difficult due to the accessibility of fully-formed robotic swarms, and the available swarms are often expensive or ineffective. The goal of our project is to design and build a robot that can communicate via ultra wideband and scale up to a larger swarm, with the capability of assessing SLAM algorithms and swarm experimentation. 
+
+Table of Contents
+--------------------
+
+- [Resources](#resources)
+  * [Dynamixel Instructions](#dynamixel-workbench)
+  * [Intel RealSense Instructions](#ros-wrapper-for-intel-realsense-devices)
+  * [RPLiDAR Instructions](#rplidar-ros-node-and-test-application)
+- [Hardware Setup](#hardware-setup)
+  * [Connection Diagram](#connection-diagram)
+  * [Multi-Robot Swarm Connections Diagram](#multi-robot-swarm-connections-diagram)
+- [Software Setup](#software-setup)
+  * [ROS System Architecture Diagram](#ros-system-architecture-diagram)
+- [Design Principles](#design-principles)
+  * [CAD Design on SolidWorks 2018](#cad-design-on-solidworks-2018)
+- [Getting Started](#getting-started)
+  * [Setting Up](#setting-up)
+  * [Running](#setting-up)
+  * [Troubleshooting](#setting-up)
+- [More Information](#more-information)
+- [Authors](#authors)
+- [Credits](#credits)
+- [License](#license)
+
+
 ## Resources
 
 ### Dynamixel Workbench
@@ -38,7 +63,7 @@ Control and communication between Dynamixel motors, which can be controlled as o
 - [ROBOTIS e-Manual for OpenCR](http://emanual.robotis.com/docs/en/parts/controller/opencr10/)
 
 
-### ROS Wrapper for Intel&reg; RealSense&trade; Devices
+### ROS Wrapper for Intel RealSense Devices
 -------------------------------------------------------
 
 The Intel RealSense is a great camera for high quality RGB and depth streams for 3D scanning and video capture. The integrated IMU sensor allows for improved navigation capabilities. We went with the RealSense 435i for its global shuttering and larger field of view.  
@@ -182,7 +207,7 @@ We based our design around similar principles as the Turtlebot3, a popular indus
 #### Connection Diagram
 ![screenshot](https://user-images.githubusercontent.com/66733789/86042497-3e44d780-ba15-11ea-9029-2bfb11db3b1c.png)
 
-#### Multi-robot Swarm Connections Diagram
+#### Multi-Robot Swarm Connections Diagram
 ![Screenshot 2020-06-29 at 5 33 57 PM](https://user-images.githubusercontent.com/66733789/86058475-f632ae80-ba2e-11ea-8996-7b5bd60f3f86.png)
 
 
@@ -217,7 +242,7 @@ Our design is centered around several principles, which are loosely ordered by i
 ![Screenshot 2020-06-29 at 5 30 12 PM](https://user-images.githubusercontent.com/66733789/86058123-5d039800-ba2e-11ea-9ee7-4894279078cf.png)
 
 
-## "Hello World!"
+## Getting Started
 ----------------
 
 ### Setting up
