@@ -64,6 +64,13 @@ Control and communication between Dynamixel motors, which can be controlled as o
 
 Following the steps outlined in the Dynamixel Workbench e-manual worked successfully for us. Configuring the environment and packages for ROS was relatively simple, and it was possible to test the Dynamixels from the computer after a few tweaks outlined in debugging. These are important debugging steps that utilize Dynamixel Wizard 2.0 (available on Windows, Linux, and Mac) for configuring the motors before they can communicate with the NUC remotely. 
 
+Once properly set up (either with test computer or NUC), the Dynamixels can be controlled from the keyboard with a few Linux commands. 
+```bash
+$ cd ~/catkin_ws && catkin_make
+$ roslaunch dynamixel_workbench_operators wheel_operator.launch
+$ roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch use_cmd_vel:=true
+```
+
 ### ROS Wrapper for Intel RealSense Devices
 -------------------------------------------------------
 
@@ -120,7 +127,18 @@ To start the camera node in ROS:
 roslaunch realsense2_camera rs_camera.launch
 ```
 
-This will stream all camera sensors and publish on the appropriate ROS topics. Other stream resolutions and frame rates can optionally be provided as parameters to the 'rs_camera.launch' file.
+This will stream all camera sensors and publish on the appropriate ROS topics. Other stream resolutions and frame rates can optionally be provided as parameters to the 'rs_camera.launch' file. 
+
+If you're looking to test with more specific data-gathering modes, you can generate a pointcloud with the RealSense. Visualizing the camera output can be easily set up through Rviz, by launching Rviz in another terminal. There are a few steps to configuring the camera settings, shown below.
+
+To start the pointcloud camera node in ROS:
+```bash
+roslaunch realsense2_camera rs-camera.launch filters:=pointcloud 
+``` 
+1. Launch Rviz in separate terminal
+2. Switch Fixed Frame to camera_link
+3. Add in Image and PointCloud2
+4. Designate Image Topic and Topic to the visual input that you want to generate the pointcloud from (it doesn’t automatically select those options, which may result in ‘no image found’)
 
 #### Published Topics
 
