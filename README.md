@@ -34,7 +34,7 @@ Table of Contents
 ### Dynamixel Workbench
 ----------------------
 
-Control and communication between Dynamixel motors, which can be controlled as one or daisy-chained together for shared power and movement. Deciding on software platforms largely depends on three things: type of Dynamixel motor, other components, and software configuration. Our software was built using the Dynamixel SDK due to larger control over the adjustments and fine-tuning. 
+Control and communication between Dynamixel motors, which can be controlled as one or daisy-chained together for shared power and movement. Deciding on software platforms largely depends on three things: type of Dynamixel motor, other components, and software configuration. Our software was built using the Dynamixel Workbench due to larger control over the adjustments and fine-tuning. 
 (Full workbench can be found at https://github.com/MarineRoboticsGroup/dynamixel-workbench) 
 
 #### ROBOTIS e-Manual for Dynamixel Workbench
@@ -62,6 +62,7 @@ Control and communication between Dynamixel motors, which can be controlled as o
 - [ROBOTIS e-Manual for OpenManipulator](http://emanual.robotis.com/docs/en/platform/openmanipulator/)
 - [ROBOTIS e-Manual for OpenCR](http://emanual.robotis.com/docs/en/parts/controller/opencr10/)
 
+Following the steps outlined in the Dynamixel Workbench e-manual worked successfully for us. Configuring the environment and packages for ROS was relatively simple, and it was possible to test the Dynamixels from the computer after a few tweaks outlined in debugging. These are important debugging steps that utilize Dynamixel Wizard 2.0 (available on Windows, Linux, and Mac) for configuring the motors before they can communicate with the NUC remotely. 
 
 ### ROS Wrapper for Intel RealSense Devices
 -------------------------------------------------------
@@ -187,6 +188,15 @@ Notice: the different is serial_baudrate between A1/A2 and A3
 
 RPLidar frame must be broadcasted according to picture shown in rplidar-frame.png
 
+## Network setup
+------------------
+
+1. Set up NUC and Nano with software (Ubuntu 18.04 and ROS). For the Nano, downloading ROS is a little trickier due to its arm-based architecture but JetsonHacks has nice, full software downloads. It's worth noting that the Jetson software can only be booted from a micro-sd card whereas the NUC could boot off of a flash drive. 
+2. Connect the NUC to local wifi and the Nano to NUC via ethernet (Nano doesn't have wifi access).
+3. Set up chrome remote desktop on NUC so you can visualize its GUI. Set up ssh for Nano (chrome remote doesn't support arm-based architecture) with openssh.
+4. Connect to the NUC via chrome remote and ssh into Nano to begin. While the above section on installing all necessary RealSense software is fine, sudo apt-get install ros-melodic-realsense2-camera downloads all necessary software to the Nano.
+5. Set EXPORT ROS_MASTER_URI and EXPORT ROS_IP to Nano's IP address so you can run Rviz from NUC while running the RealSense through the Nano.
+
 ## Hardware setup
 -----------------
 
@@ -259,6 +269,10 @@ All listed components are the main parts of the robot, but other parts are neede
 - Be sure to use USB3.x for the RealSense camera, otherwise you will run into limitations on depth+rgb throughput when testing in ROS. 
 [Intel's website](https://www.intelrealsense.com/wp-content/uploads/2019/03/Depth_Camera_powered_by_Ethernet_WhitePaper.pdf)  
 (Currently incomplete)
+- The Dynamixels require direct configuration from the Dynamixel Wizard 2.0 application, which can be downloaded onto any platform. For the computer to be able to communicate with each Dynamixel, we found that registering them on Wizard was the most simple. 
+    - After connecting the Dynamixels to the NUC and a power source, scan for the connected motors on the Wizard. The XL430-W250 motors that we used were registered with 57600 baud rate and Protocol 2.0. 
+    - Once they were registered via scanning, it was necessary to configure them to 'wheel mode' from the automatic 'joint mode'. This could be done through the control panel with 'Operating Mode', changing the mode to '1' or velocity-based. Editing the system controls is only possible when torque mode is turned off, but it should be turned on for running tests. 
+    - Since the motors are mirrored, it's necessary to configure them to run in the same direction. This can also be done through Dynamixel Wizard 2.0, by checking 'Reverse-drive mode'. 
 
 ## More information
 
