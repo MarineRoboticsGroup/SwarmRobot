@@ -12,6 +12,7 @@ Table of Contents
   * [Dynamixel Instructions](#dynamixel-workbench)
   * [Intel RealSense Instructions](#ros-wrapper-for-intel-realsense-devices)
   * [RPLiDAR Instructions](#rplidar-ros-node-and-test-application)
+- [Network Setup](#network-setup)
 - [Hardware Setup](#hardware-setup)
   * [Connection Diagram](#connection-diagram)
   * [Multi-Robot Swarm Connections Diagram](#multi-robot-swarm-connections-diagram)
