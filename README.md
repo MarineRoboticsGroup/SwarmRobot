@@ -232,14 +232,12 @@ RPLidar frame must be broadcasted according to picture shown in rplidar-frame.pn
 
 
 ### Setting Static IP Addresses for the NUC and Nano
---------------------------------------------------
 
 Setting the Nano’s IP address permanently was tricky due to the wandering range of IP addresses that the DCHP would accept/look for. Most of the time, the Nano connected to the NUC using 10.42.0.25, but every so often, 10.42.0.26 might be the correct address.
 
 The solution to this is to go into the nm-manager-editor settings on the Nano (through a hard connection to the monitor + keyboard/mouse) and ‘MANUALLY’ setting the IP configuration to 10.42.0.25 through netmask 255.255.255.255 (IPv4 settings).
 
 ### Registering Dynamixel and RPLiDAR USB Ports
---------------------------------------------------
 
 As mentioned above, you must register the USB devices (for the Dynamixels and RPLiDAR) robustly so that they have a consistent USB id. This is because the USB devices are assigned dynamically as each device is plugged in e.g. /dev/ttyUSB0, /dev/ttyUSB1 etc…
 
@@ -280,7 +278,6 @@ roslaunch rplidar_ros view_rplidar.launch  serial_port:=/dev/rplidar
 ``` 
 
 ### Environment Variables and Host Key Setup
-------------------------------------------------
 
 /opt/ros/melodic/env.sh needs to be edited to include specific environment variables on ~/.bashrc.
 
@@ -299,7 +296,7 @@ hia" env-loader="/opt/ros/melodic/env.sh" default="true" />
 
 All of the necessary code and configs must be set up on the master node that is invoking things remotely - the NUC in our case. 
 
-More good info here:
+More helpful info here:
 http://wiki.ros.org/roslaunch/XML/machine
 
 SSH keys won't work by default, e.g. if you already connected to the Jetson through SSH. ROS needs a very specific kind of key in ~/.ssh/known_hosts. If you get a weird error then you will need to remove this file (or at least the entry for the Jetson if you can find it) and then reconnect per these instructions:
@@ -350,13 +347,11 @@ The ROS nodes and communications will be running on Ubuntu 18.04 with ROS Melodi
 - RealSense = http://wiki.ros.org/RealSense
 
 ### Configuring Master Launch File
------------------------------------
 
 Running multiple launch files with one or more arguments is a little more tricky. We found that you needed to pass in the specific launch file arguments through the component launch files. As an example, setting the USB port for the RPLiDAR isn’t passed in through NUC.launch file, rather you have to go into the test_rplidar.launch file and manually set it through nano test_rplidar.launch.
 
 #### ROS System Architecture Diagram
 ![Screenshot 2020-06-29 at 2 37 17 PM](https://user-images.githubusercontent.com/66733789/86043502-d5f6f580-ba16-11ea-907d-89f3ed522685.png)
-
 
 ## Design principles
 -----------------------
@@ -431,6 +426,7 @@ sudo chmod 666 /dev/ttyUSB0"
 This changes the permissions of RPLiDAR rules file from 0777 to 0666, as it automatically reverts to 0777 when the LiDAR starts running or is plugged in. Once the command is in, everything runs smoothly. (This is separate from long-term set-up with setting sym-links to the RPLiDAR USB port, aimed towards quick initial testing.)
 
 ### Troubleshooting
+---------------------
 
 - Be sure to use USB3.x for the RealSense camera, otherwise you will run into limitations on depth+rgb throughput when testing in ROS. 
 [Intel's website](https://www.intelrealsense.com/wp-content/uploads/2019/03/Depth_Camera_powered_by_Ethernet_WhitePaper.pdf)  
@@ -479,19 +475,24 @@ Here are some steps for successfully creating a to-scale representation.
 
 
 ## More information
+---------------------
 
 Documentation is available on the MRG Drive with full instructions and explanations. If you have any questions that aren't answered from the GitHub or Google Drive, please feel free to reach out to Sophia Franklin on slack or at sophia.franklin@gmail.com. 
 
 ## Authors
+--------------
 
 * **Sophia Franklin** 
 
 ## Credits
+--------------
+
 * **ROBOTIS-GIT/dynamixel-workbench**
 * **kintzhao and the rest of the contributors for https://github.com/robopeak/rplidar_ros**
 * **Intel and the contributors at https://github.com/IntelRealSense/realsense-ros**
 * **JetsonHacks at jetsonhacks.com**
 
 ## License
+-------------
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
