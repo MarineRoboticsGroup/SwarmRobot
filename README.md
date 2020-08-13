@@ -220,6 +220,87 @@ RPLidar frame must be broadcasted according to picture shown in rplidar-frame.pn
 6. Connect to the NUC via chrome remote and ssh into Nano to begin. While the above section on installing all necessary RealSense software is fine, sudo apt-get install ros-melodic-realsense2-camera downloads all necessary software to the Nano.
 7. Set EXPORT ROS_MASTER_URI and EXPORT ROS_IP to Nano's IP address so you can run Rviz from NUC while running the RealSense through the Nano. To launching Nano launch files from NUC requires specific env. variables and a path set with a host key, which is explained in more depth below. 
 
+
+### Setting Static IP Addresses for the NUC/Nano
+--------------------------------------------------
+
+Setting the Nano’s IP address permanently was tricky due to the wandering range of IP addresses that the DCHP would accept/look for. Most of the time, the Nano connected to the NUC using 10.42.0.25, but every so often, 10.42.0.26 might be the correct address.
+
+The solution to this is to go into the nm-manager-editor settings on the Nano (through a hard connection to the monitor + keyboard/mouse) and ‘MANUALLY’ setting the IP configuration to 10.42.0.25 through netmask 255.255.255.255 (IPv4 settings).
+
+### Registering Dynamixel and RPLiDAR USB Ports
+--------------------------------------------------
+
+As mentioned above, you must register the USB devices (for the Dynamixels and RPLiDAR) robustly so that they have a consistent USB id. This is because the USB devices are assigned dynamically as each device is plugged in e.g. /dev/ttyUSB0, /dev/ttyUSB1 etc…
+
+To solve this, you can update /etc/udev/rules.d/* to match specific devices and create symbolic links:
+/dev/rplidar
+/dev/dynamixel
+
+The two rules used:
+
+99-dynamixel-workbench-cdc.rules
+```bash
+#http://linux-tips.org/t/prevent-modem-manager-to-capture-usb-serial-devices/284/2.
+
+#cp rules /etc/udev/rules.d/
+#sudo udevadm control --reload-rules
+#sudo udevadm trigger
+
+KERNEL=="ttyUSB*", DRIVERS=="ftdi_sio", MODE="0666", ATTR{device/latency_timer}="1", SYMLINK+="dynamixel"
+``` 
+
+88-rplidar.rules
+```bash
+# set the udev rule , make the device_port be fixed by rplidar
+# ref: https://askubuntu.com/questions/1039814/how-to-create-a-udev-rule-for-two-devices-with-the-same-manufacturer-id-product
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE:="0777", SYMLINK+="rplidar"
+``` 
+
+Then to reload:
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+``` 
+
+Then you can specify a port with each command:
+```bash
+roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch use_cmd_vel:=true usb_port:=/dev/dynamixel
+roslaunch rplidar_ros view_rplidar.launch  serial_port:=/dev/rplidar
+``` 
+
+### Env. Variables and Host Key Set-Up
+---------------------------------------
+
+/opt/ros/melodic/env.sh needs to be edited to include specific environment variables on ~/.bashrc.
+
+export ROS_IP=10.42.0.25
+export ROS_MASTER_URI=http://10.42.0.1:11311
+
+Set up a group with additional machine info then include the file (which is included in the NUC launch file for conveniance). 
+
+```bash
+  <group>
+    <machine name="jetset_nano" address="10.42.0.25" user="sophia" password="sop
+hia" env-loader="/opt/ros/melodic/env.sh" default="true" />
+    <include file="/home/sophia/nanolaunch.launch" />
+  </group>
+``` 
+
+All of the necessary code and configs must be set up on the master node that is invoking things remotely - the NUC in our case. 
+
+More good info here:
+http://wiki.ros.org/roslaunch/XML/machine
+
+SSH keys won't work by default, e.g. if you already connected to the Jetson through SSH. ROS needs a very specific kind of key in ~/.ssh/known_hosts. If you get a weird error then you will need to remove this file (or at least the entry for the Jetson if you can find it) and then reconnect per these instructions:
+
+```bash
+ssh -oHostKeyAlgorithms='ssh-rsa' 10.42.0.25
+
+Install realsense camera on NUC so that all of the files are there:
+sudo apt-get install ros-melodic-realsense2-camera
+``` 
+
 ## Hardware setup
 -----------------
 
@@ -242,7 +323,7 @@ We based our design around similar principles as the Turtlebot3, a popular indus
 
 #### Connection Diagram
 ![screenshot](https://user-images.githubusercontent.com/66733789/86042497-3e44d780-ba15-11ea-9029-2bfb11db3b1c.png)
-![image](https://user-images.githubusercontent.com/66733789/90139057-d8eb4280-dd45-11ea-8926-8e3549b8d922.png)
+![image](https://user-images.githubusercontent.com/66733789/90141328-02599d80-dd49-11ea-8848-1765b3c7a7d8.png)
 
 #### Multi-Robot Swarm Connections Diagram
 ![Screenshot 2020-06-29 at 5 33 57 PM](https://user-images.githubusercontent.com/66733789/86058475-f632ae80-ba2e-11ea-8996-7b5bd60f3f86.png)
@@ -257,6 +338,11 @@ The ROS nodes and communications will be running on Ubuntu 18.04 with ROS Melodi
 - Dynamixel Workbench Metapackage = http://wiki.ros.org/dynamixel_workbench
 - RPLiDAR = http://wiki.ros.org/rplidar
 - RealSense = http://wiki.ros.org/RealSense
+
+### Configuring Master Launch File
+-----------------------------------
+
+Running multiple launch files with one or more arguments is a little more tricky. We found that you needed to pass in the specific launch file arguments through the component launch files. As an example, setting the USB port for the RPLiDAR isn’t passed in through NUC.launch file, rather you have to go into the test_rplidar.launch file and manually set it through nano test_rplidar.launch.
 
 #### ROS System Architecture Diagram
 ![Screenshot 2020-06-29 at 2 37 17 PM](https://user-images.githubusercontent.com/66733789/86043502-d5f6f580-ba16-11ea-907d-89f3ed522685.png)
@@ -307,6 +393,24 @@ All listed components are the main parts of the robot, but other parts are neede
 - MaxOak auto-sleeps without enough current draw, keep RPLiDAR plugged in
 - Print Solidworks Drawings to scale using custom scale and pdf-poster generator
 - Dynamixel threaded holes are only 4mm deep, can breach inner chamber if not careful
+
+### Printing SolidWorks Drawings To-Scale
+------------------------------------------
+
+Printing a full-size drawing of a design can be helpful in the prototyping or manufacturing phase, depending on your set-up and available tools.
+
+Here are some steps for successfully creating a to-scale representation.
+
+1. Create the part in SolidWorks
+2. Open as Drawing (DRWG)
+3. Depending on the size of the part, make custom paper size (in multiples of 8.5”x11”) if larger than letter paper
+4. Put goal view on page and select ‘scale to page’
+5. Change page scale to be 1:1 (most printers aren’t accurate enough to print 1:1. Print out a test measurement ex. a six inch line, and modify the first ‘1’ to that value.)
+6. Our printer’s scale was closer to 1.03225:1, which I put into the custom scale properties.
+7. Save drawing as pdf
+8. Open pdf in a pdf reader (make sure the app can print posters if part is larger than letter paper, I used Adobe Acrobat.)
+9. Print as poster in pdf reader, spanning across pages with 100% scaling.
+10. Cut pages at lines and assemble paper design with tape for a simple to-scale drawing.
 
 
 ## More information
