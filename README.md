@@ -212,9 +212,11 @@ RPLidar frame must be broadcasted according to picture shown in rplidar-frame.pn
 
 1. Set up NUC and Nano with software (Ubuntu 18.04 and ROS). For the Nano, downloading ROS is a little trickier due to its arm-based architecture but JetsonHacks has nice, full software downloads. It's worth noting that the Jetson software can only be booted from a micro-sd card whereas the NUC could boot off of a flash drive. 
 2. Connect the NUC to local wifi and the Nano to NUC via ethernet (Nano doesn't have wifi access).
-3. Set up chrome remote desktop on NUC so you can visualize its GUI. Set up ssh for Nano (chrome remote doesn't support arm-based architecture) with openssh.
-4. Connect to the NUC via chrome remote and ssh into Nano to begin. While the above section on installing all necessary RealSense software is fine, sudo apt-get install ros-melodic-realsense2-camera downloads all necessary software to the Nano.
-5. Set EXPORT ROS_MASTER_URI and EXPORT ROS_IP to Nano's IP address so you can run Rviz from NUC while running the RealSense through the Nano.
+3. Set static IP addresses with nm-connection-editor for the NUC and Nano on both wifi and ethernet sides, as IP addresses are dynamically assigned
+4. Set up chrome remote desktop on NUC so you can visualize its GUI. Set up ssh for Nano (chrome remote doesn't support arm-based architecture) with openssh.
+5. Dynamixel and RPLiDAR usb ports are also dynamically assigned on NUC but specific to each component, set symlinks in respective launch files via /etc/udev/rules
+6. Connect to the NUC via chrome remote and ssh into Nano to begin. While the above section on installing all necessary RealSense software is fine, sudo apt-get install ros-melodic-realsense2-camera downloads all necessary software to the Nano.
+7. Set EXPORT ROS_MASTER_URI and EXPORT ROS_IP to Nano's IP address so you can run Rviz from NUC while running the RealSense through the Nano. To launching Nano launch files from NUC requires specific env. variables and a path set with a host key, which is explained in more depth below. 
 
 ## Hardware setup
 -----------------
@@ -235,6 +237,7 @@ We based our design around similar principles as the Turtlebot3, a popular indus
 
 #### Connection Diagram
 ![screenshot](https://user-images.githubusercontent.com/66733789/86042497-3e44d780-ba15-11ea-9029-2bfb11db3b1c.png)
+![image](https://user-images.githubusercontent.com/66733789/90139057-d8eb4280-dd45-11ea-8926-8e3549b8d922.png)
 
 #### Multi-Robot Swarm Connections Diagram
 ![Screenshot 2020-06-29 at 5 33 57 PM](https://user-images.githubusercontent.com/66733789/86058475-f632ae80-ba2e-11ea-8996-7b5bd60f3f86.png)
@@ -276,7 +279,7 @@ Our design is centered around several principles, which are loosely ordered by i
 
 ### Setting up
 
-All listed components are the main parts of the robot, but other parts are needed for power distribution and connection. These include: one or more power banks with the required ports, barrel jack cables, TTL adaptors, wheels, ball caster (for stability), and plates (we custom designed and laser-cut the plates). 
+All listed components are the main parts of the robot, but other parts are needed for power distribution and connection. These include: one or more power banks with the required ports, barrel jack cables, USB micro cables, USB-C cablesTTL adaptors, sticky velcro tape, wheels, ball caster (for stability), and plates (we custom designed and laser-cut the plates). 
 (Currently incomplete)
 
 ### Running
@@ -291,7 +294,13 @@ All listed components are the main parts of the robot, but other parts are neede
 - The Dynamixels require direct configuration from the Dynamixel Wizard 2.0 application, which can be downloaded onto any platform. For the computer to be able to communicate with each Dynamixel, we found that registering them on Wizard was the most simple. 
     - After connecting the Dynamixels to the NUC and a power source, scan for the connected motors on the Wizard. The XL430-W250 motors that we used were registered with 57600 baud rate and Protocol 2.0. 
     - Once they were registered via scanning, it was necessary to configure them to 'wheel mode' from the automatic 'joint mode'. This could be done through the control panel with 'Operating Mode', changing the mode to '1' or velocity-based. Editing the system controls is only possible when torque mode is turned off, but it should be turned on for running tests. 
-    - Since the motors are mirrored, it's necessary to configure them to run in the same direction. This can also be done through Dynamixel Wizard 2.0, by checking 'Reverse-drive mode'. 
+    - Since the motors are mirrored, it's necessary to configure them to run in the same direction. This can also be done through Dynamixel Wizard 2.0, by checking 'Reverse-drive mode'.
+- Set Jetson to low power mode to run off of USB (board comes with jumper to switch to barrel-jack input, not needed for low-power mode.
+- Configure Dynamixels using Wizard 2.0 (torque on, register USB ports, set direction)
+- MaxOak auto-sleeps without enough current draw, keep RPLiDAR plugged in
+- Print Solidworks Drawings to scale using custom scale and pdf-poster generator
+- Dynamixel threaded holes are only 4mm deep, can breach inner chamber if not careful
+
 
 ## More information
 
@@ -305,6 +314,7 @@ All listed components are the main parts of the robot, but other parts are neede
 * **ROBOTIS-GIT/dynamixel-workbench**
 * **kintzhao and the rest of the contributors for https://github.com/robopeak/rplidar_ros**
 * **Intel and the contributors at https://github.com/IntelRealSense/realsense-ros**
+* **JetsonHacks at jetsonhacks.com**
 
 ## License
 
