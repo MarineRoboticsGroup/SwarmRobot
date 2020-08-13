@@ -15,17 +15,27 @@ Table of Contents
   * [Intel RealSense Instructions](#ros-wrapper-for-intel-realsense-devices)
   * [RPLiDAR Instructions](#rplidar-ros-node-and-test-application)
 - [Network Setup](#network-setup)
+  * [Setting Static IP Addresses for the NUC and Nano](#setting-static-ip-addresses-for-the-nuc-and-nano)
+  * [Registering Dynamixel and RPLiDAR USB Ports](#registering-dynamixel-and-rplidar-usb-ports)
+  * [Environment Variables and Host Key Setup](environment-variables-and-host-key-setup]
 - [Hardware Setup](#hardware-setup)
   * [Connection Diagram](#connection-diagram)
   * [Multi-Robot Swarm Connections Diagram](#multi-robot-swarm-connections-diagram)
 - [Software Setup](#software-setup)
   * [ROS System Architecture Diagram](#ros-system-architecture-diagram)
+  * [Configuring Master Launch File](#configuring-master-launch-file)
 - [Design Principles](#design-principles)
   * [CAD Design on SolidWorks 2018](#cad-design-on-solidworks-2018)
 - [Getting Started](#getting-started)
   * [Setting Up](#setting-up)
   * [Running](#setting-up)
+   * [Hello World for Components](#hello-world-for-components)
+    * [RealSense](#realsense)
+    * [Dynamixels](#dynamixels)
+    * [RPLiDAR](#rplidar)
   * [Troubleshooting](#setting-up)
+   * [Registering Dynamixels](#registering-dynamixels)
+   * [Printing SolidWorks Drawings To Scale](#printing-solidworks-drawings-to-scale)
 - [More Information](#more-information)
 - [Authors](#authors)
 - [Credits](#credits)
@@ -221,7 +231,7 @@ RPLidar frame must be broadcasted according to picture shown in rplidar-frame.pn
 7. Set EXPORT ROS_MASTER_URI and EXPORT ROS_IP to Nano's IP address so you can run Rviz from NUC while running the RealSense through the Nano. To launching Nano launch files from NUC requires specific env. variables and a path set with a host key, which is explained in more depth below. 
 
 
-### Setting Static IP Addresses for the NUC/Nano
+### Setting Static IP Addresses for the NUC and Nano
 --------------------------------------------------
 
 Setting the Nano’s IP address permanently was tricky due to the wandering range of IP addresses that the DCHP would accept/look for. Most of the time, the Nano connected to the NUC using 10.42.0.25, but every so often, 10.42.0.26 might be the correct address.
@@ -269,8 +279,8 @@ roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch use_cmd_v
 roslaunch rplidar_ros view_rplidar.launch  serial_port:=/dev/rplidar
 ``` 
 
-### Env. Variables and Host Key Set-Up
----------------------------------------
+### Environment Variables and Host Key Setup
+------------------------------------------------
 
 /opt/ros/melodic/env.sh needs to be edited to include specific environment variables on ~/.bashrc.
 
@@ -301,7 +311,7 @@ Install realsense camera on NUC so that all of the files are there:
 sudo apt-get install ros-melodic-realsense2-camera
 ``` 
 
-## Hardware setup
+## Hardware Setup
 -----------------
 
 We based our design around similar principles as the Turtlebot3, a popular industry swarm robot. The major differences between the two are from additional sensing capabilities and different components, e.g. swapping the Jetson Nano for the Raspberry Pi computer. 
@@ -329,7 +339,7 @@ We based our design around similar principles as the Turtlebot3, a popular indus
 ![Screenshot 2020-06-29 at 5 33 57 PM](https://user-images.githubusercontent.com/66733789/86058475-f632ae80-ba2e-11ea-8996-7b5bd60f3f86.png)
 
 
-## Software setup
+## Software Setup
 --------------
 
 The ROS nodes and communications will be running on Ubuntu 18.04 with ROS Melodic. This can also be done using previous versions of Ubuntu and ROS with most available software. Packages available for reference from ROS Wiki are listed below:
@@ -377,7 +387,48 @@ All listed components are the main parts of the robot, but other parts are neede
 
 ### Running
 
-(Currently incomplete)
+Once the wifi and networking is configured, you can Chrome Remote or SSH into the NUC (and then into the Nano from the NUC). You can now communicate and control the NUC/Nano. Whether you're looking to test SLAM algorithms on the NUC's software platform or teleoperate the robot(s), it's all possible through the robot's software platform.
+
+#### Hello World for Components
+
+Hello World for Components: Basic control with individual components
+
+##### RealSense 
+1. Run roslaunch realsense2_camera rs_camera.launch to start the realsense node
+2. Run realsense-viewer to open the graphical display (best method for testing because user can see camera output)
+3. Run roslaunch realsense2_camera rs-camera.launch filters:=pointcloud and keep open
+4. In another terminal, run rviz to generate 3D pointcloud 
+- Switch Fixed Frame to camera_link
+- Add in Image and PointCloud2
+
+Debugging: designate Image Topic and Topic to the visual input that you want to generate the pointcloud from (it doesn’t automatically select those options, which may result in ‘no image found’)
+
+##### Dynamixels 
+
+Once the Dynamixels are configured with Dynamixel Wizard 2.0 (explained in greater detail under 'Troubleshooting', you can control the motors through the terminal. Dynamixel Workbench allow for python and cpp, and we recommend following the manual procedures for a ROS-based platform from the Dynamixel-Workbench GitHub repository. 
+
+Summing up the process:
+- There are three gits to download (workbench, msgs, and SDK)
+- Setup SDK and Workbench libraries with 64bit arch (skip sample code from SDK)
+- Copy rules files, check USB port
+- Finding Dynamixels is waste of time as it only registers one (don’t be alarmed by that, only one is connected)
+- Test connection with Workbench by 
+```bash
+cd  ~/dynamixel-workbench/dynamixel_workbench_toolbox/examples/build
+./position /dev/ttyUSB0 57600 1 (will rotate pi degrees 6 times)
+``` 
+
+##### RPLiDAR
+
+The LiDAR starts spinning as soon as micro-USB is plugged into pc, and you can test the node control with roslaunch rplidar_ros view_rplidar.launch. This program generates a rviz graphical readout where pointcloud is continuously made from LiDAR data.
+
+Debugging: 
+
+An error might occur where the RPLiDAR couldn’t bind to the specified serial port /dev/tty/USB0. This seems to be common LiDAR problem, remedied through the command:
+```bash
+sudo chmod 666 /dev/ttyUSB0"
+``` 
+This changes the permissions of RPLiDAR rules file from 0777 to 0666, as it automatically reverts to 0777 when the LiDAR starts running or is plugged in. Once the command is in, everything runs smoothly. (This is separate from long-term set-up with setting sym-links to the RPLiDAR USB port, aimed towards quick initial testing.)
 
 ### Troubleshooting
 
@@ -394,8 +445,22 @@ All listed components are the main parts of the robot, but other parts are neede
 - Print Solidworks Drawings to scale using custom scale and pdf-poster generator
 - Dynamixel threaded holes are only 4mm deep, can breach inner chamber if not careful
 
-### Printing SolidWorks Drawings To-Scale
-------------------------------------------
+
+#### Registering Dynamixels
+
+As mentioned above, you can register and configure the Dynamixel motors using DYnamixel Wizard 2.0. This was the most simple platform for a quick set-up, and runs on Windows, Linux, and Mac. 
+
+- Set up the Dynamixels with the U2D2, U2D2 Power Hub, and the power source.
+- Select Dynamixel X and port COM4 (or the port that the Dynamixel automatically connects to via USB)
+  - You can find the connected port on the pc using Device Manager
+- It will appear to connect, then run a search using baud rate
+- XL-430 connects with any baud rate, can go with the standard '57600'
+- Once connected, test out connection with Control Table. Turn on Torque Enable and move around through Goal Position. You can also reverse direction of one or more motors to get opposite motors running in parallel. 
+
+Debugging: MaxOak will shut down if there’s not a high enough current draw. When lights aren’t on/power button hasn’t been pressed in x amount of time, that’s because the two main outputs shut down with 150 and 200 mA. 
+
+
+#### Printing SolidWorks Drawings To Scale
 
 Printing a full-size drawing of a design can be helpful in the prototyping or manufacturing phase, depending on your set-up and available tools.
 
