@@ -1,0 +1,10 @@
+<launch>
+ 
+ <arg name="filters"      default="pointcloud"/>
+  
+ <include file="$(find realsense2_camera)/launch/rs_camera.launch" >
+  <arg name="align_depth" value="true"/>
+  <arg name="filters"     value="$(arg filters)"/>
+ </include>
+ 
+</launch>
