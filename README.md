@@ -5,6 +5,8 @@ Background
 
 Testing and implementing developed SLAM algorithms is difficult due to the accessibility of fully-formed robotic swarms, and the available swarms are often expensive or ineffective. The goal of our project is to design and build a robot that can communicate via ultra wideband and scale up to a larger swarm, with the capability of assessing SLAM algorithms and swarm experimentation. 
 
+![IMG_20200811_091944 (1)](https://user-images.githubusercontent.com/66733789/90140512-da1d6f00-dd47-11ea-997a-4290ef179129.jpg)
+
 Table of Contents
 --------------------
 
@@ -223,6 +225,9 @@ RPLidar frame must be broadcasted according to picture shown in rplidar-frame.pn
 
 We based our design around similar principles as the Turtlebot3, a popular industry swarm robot. The major differences between the two are from additional sensing capabilities and different components, e.g. swapping the Jetson Nano for the Raspberry Pi computer. 
 
+![IMG_20200811_091244 (1)](https://user-images.githubusercontent.com/66733789/90140625-0507c300-dd48-11ea-98be-9b012315e0c9.jpg)
+![IMG_20200810_095200](https://user-images.githubusercontent.com/66733789/90140713-1ea90a80-dd48-11ea-95b0-4f4a6d481a8c.jpg)
+
 - (ROS Control Module) Intel NUC7i3DNHNC Mini PC
 - (Computer) Jetson Nano Developer Kit
 - (UWB/Communications) DWM1001 Development Board
@@ -271,8 +276,8 @@ The ROS nodes and communications will be running on Ubuntu 18.04 with ROS Melodi
 Our design is centered around several principles, which are loosely ordered by importance above. Testing capabilities for SLAM were primarily important for research purposes, and scalability for testing swarms. A robust design is critical for repeated testing and multi-purpose experiments. Since our robot design's function is for indoors SLAM, the cheap yet effective ultra wideband was a solution for efficient indoor communications. Working in ROS, keeping the robot's software modular helps debugging while also keeping the system dynamic. 
 
 #### CAD Design on SolidWorks 2018
-![Screenshot 2020-06-29 at 5 30 12 PM](https://user-images.githubusercontent.com/66733789/86058123-5d039800-ba2e-11ea-9ee7-4894279078cf.png)
-
+![image](https://user-images.githubusercontent.com/66733789/90139314-31badb00-dd46-11ea-90d8-fe72a71b2b9c.png)
+![image](https://user-images.githubusercontent.com/66733789/90139395-4e571300-dd46-11ea-8965-1a4f023bb480.png)
 
 ## Getting Started
 ----------------
@@ -281,6 +286,8 @@ Our design is centered around several principles, which are loosely ordered by i
 
 All listed components are the main parts of the robot, but other parts are needed for power distribution and connection. These include: one or more power banks with the required ports, barrel jack cables, USB micro cables, USB-C cablesTTL adaptors, sticky velcro tape, wheels, ball caster (for stability), and plates (we custom designed and laser-cut the plates). 
 (Currently incomplete)
+
+![image](https://user-images.githubusercontent.com/66733789/90140916-69c31d80-dd48-11ea-9a26-2d006f112616.png)
 
 ### Running
 
@@ -304,7 +311,7 @@ All listed components are the main parts of the robot, but other parts are neede
 
 ## More information
 
-(Currently incomplete)
+Documentation is available on the MRG Drive with full instructions and explanations. If you have any questions that aren't answered from the GitHub or Google Drive, please feel free to reach out to Sophia Franklin on slack or at sophia.franklin@gmail.com. 
 
 ## Authors
 
