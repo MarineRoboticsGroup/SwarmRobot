@@ -17,7 +17,7 @@ Table of Contents
 - [Network Setup](#network-setup)
   * [Setting Static IP Addresses for the NUC and Nano](#setting-static-ip-addresses-for-the-nuc-and-nano)
   * [Registering Dynamixel and RPLiDAR USB Ports](#registering-dynamixel-and-rplidar-usb-ports)
-  * [Environment Variables and Host Key Setup](environment-variables-and-host-key-setup]
+  * [Environment Variables and Host Key Setup](#environment-variables-and-host-key-setup]
 - [Hardware Setup](#hardware-setup)
   * [Connection Diagram](#connection-diagram)
   * [Multi-Robot Swarm Connections Diagram](#multi-robot-swarm-connections-diagram)
