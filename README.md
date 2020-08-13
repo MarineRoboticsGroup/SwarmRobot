@@ -1,4 +1,4 @@
-# RoboSwarm
+# Swarm Robot
 
 Background
 --------------
