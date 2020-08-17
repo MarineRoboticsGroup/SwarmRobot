@@ -1,3 +1,21 @@
+#!/bin/bash
+
+# Shell script to install all required packages for RPLiDAR NUC PC
+# Make script executable (chmod +x nuc_install.sh) then run ./nuc_install.sh
+
+INSTALL_ROOT=$HOME/catkin_ws
+INSTALL_SRC=$INSTALL_ROOT/src/
+PKG_PREFIX="ros-melodic"
+
+PKGS="dynamixel-workbench navigation nav-msgs geometry-msgs sensor-msgs rqt-tf-tree rosserial-python std-msgs"
+
+GITS="https://github.com/robopeak/rplidar_ros.git"
+
+# Configure catkin workspace 
+if [ ! -d $INSTALL_SRC ]; then
+    mkdir -p $INSTALL_SRC
+fi
+cd $INSTALL_SRC
 # Downloading all listed packages; can update list 
 sudo apt-get update -y
 for pkg in $PKGS
