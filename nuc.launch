@@ -1,6 +1,6 @@
 <launch>
-  <include file="$(find dynamixel_workbench_controllers)/dynamixel_controllers.launch" />
-  <include file="$(find dynamixel_workbench_operators)/wheel_operator.launch" />
+  <include file="$(find dynamixel_workbench_controllers)/launch/dynamixel_controllers.launch" />
+  <include file="$(find dynamixel_workbench_operators)/launch/wheel_operator.launch" />
   <include file="$(find rplidar_ros)/test_rplidar.launch" />  
   <group>
     <machine name="jetson_nano" address="10.42.0.25" user="sophia" password="sophia" env-loader="/opt/ros/melodic/env.sh" default="true" />
