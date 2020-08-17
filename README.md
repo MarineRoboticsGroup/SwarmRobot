@@ -387,30 +387,30 @@ Here are the step-by-step instructions for building a swarm robot. Starting from
 1. Build robot using CAD design, labeled parts, and their corresponding cables. 
 2. Download Ubuntu 18.04 onto a USB-key and boot up NUC with the key. You will need to connect the NUC to a monitor and keyboard, as well as a suitable power source.
 3. Download the Jetson Nano Developer Kit SD Card Image to a micro-SD card (128 GB is more than enough) and follow Nvidia's set-up instructions to boot up the Nano. The Nano must also be connected to the necessary peripherals as above. 
-4. Connect back to the Nano, and connect the NUC to the local network (e.g. home network)
-5. Download Chrome 
+4. Connect back to the NUC, and connect the NUC to the local network (e.g. home network)
+5. Download Chrome and install SSH through 'sudo apt-get install openssh-server'. 
 6. Clone the SwarmRobot github into your terminal space. 
 7. Run the NUC ROS install file from 'roboswarm' folder. For all files from the SwarmRobot github, make them executable with chmod +x the_file_name to run them.)
 7. Run the NUC install and Nano install bash scripts on the NUC.
-connect nuc to home network
-8. Create an ethernet connection between the NUC and Nano using nm-connection-editor. Select ‘connect automatically’ and 'shared to other computers' on the NUC's end and ‘shared to other computers’ then restart with sudo /etc/init.d/networking restart 
-9. Connect to the Nano to the display and controls, set up ssh.
-10. Run the Nano ROS install file from 'roboswarm', and make sure to set the files as executable.
-11. Run the Nano install bash scripts from the same folder.
-12. Set up the ethernet connection on the Nano's end by editing the connection in nm-connection-editor (sudo nm-connection-editor to edit connection). On the Nano's end, the ethernet is set to DHCP. Restart the network with sudo /etc/init.d/networking restart. If the connection isn't able to turn on, make sure that the NUC is powered on.
-13. If you're working on an Ubuntu machine (the master machine, not the NUC or Nano), X11 is automatically set-up (otherwise you can download an applicable X1 server). With X11, you can work remotely from your pc after this point.
-14. ssh -Y into the NUC (the command looks something like hostname@192.1...). We're using -Y to get the graphical display of the NUC, so we can visualize its GUI and visual outputs.
-15. Create new files as in 'Registering Dynamixel and RPLiDAR USB Ports' and copy in the respective information.
-16. Go into the dynamixel_controller.launch and test_rplidar.launch files in your NUC's environment and hardcode the symlinks that you just created. This is done by simply writing in /dev/dynamixel and /dev/rplidar into the respective USB port fields.
-17. Once in the dynamixel_controller launch file, you must also set use_cmd_vel to 'true' to be able to control the wheels.
-18. Once everything is configured, you can run the NUC launch file to get all of the components moving! The Dynamixels are teleoperable with the w,a,s,d,x keys and all nodes are live (with the Jetson nodes ssh'd through the NUC ssh-key).
-19. If you're looking to go one step further and visualize the robot's camera and lidar data, this is where the X11 setup really comes in. 
-20. To do so, ssh -Y into the NUC and call roslaunch nuc.launch
-21. Once the program is running, generate a separate NUC terminal and run rviz.
-22. You can visualize the RealSense data (all the way from the Nano!) by inputting 'camera_link' and adding in 'Image'. Designate the Image 'topic' with your desired input and the realtime camera feed should appear in the bottom left screen.
-23. You can add in the laser scan data by then typing 'scan' where camera_link is (the camera feed will stay). Add in the the option 'LaserScan' through the option 'published nodes'. Input its topic as /scan and a laser scan readout should appear.
-24. You can now drive the robot around with realtime camera and laser output.
-
+8. Create an ethernet connection between the NUC and Nano using nm-connection-editor. Select ‘connect automatically’ and 'shared to other computers' on the NUC's end and ‘shared to other computers’.
+9. Configure the address network under 'shared to other computers' with Address = 10.42.0.1, Netmask = 255.255.255.0, and Gateway = 10.42.0.1. Restart with sudo /etc/init.d/networking restart back in terminal. 
+10. Connect to the Nano to the display and controls, set up ssh.
+11. Clone into the SwarmRobot Github. 
+12. Run the Nano ROS install file and install bash scripts from 'roboswarm', and make sure to set the files as executable. 
+13. Source and create a catkin workspace for future use and availability. 
+14. Set up the ethernet connection on the Nano's end by editing the connection in nm-connection-editor (sudo nm-connection-editor to edit connection). On the Nano's end, the ethernet is set to DHCP. Restart the network with sudo /etc/init.d/networking restart. If the connection isn't able to turn on, make sure that the NUC is powered on.
+15. If you're working on an Ubuntu machine (the master machine, not the NUC or Nano), X11 is automatically set-up (otherwise you can download an applicable X1 server). With X11, you can work remotely from your pc after this point.
+16. ssh -Y into the NUC (the command looks something like hostname@192.1...). We're using -Y to get the graphical display of the NUC, so we can visualize its GUI and visual outputs.
+17. Create new files as in 'Registering Dynamixel and RPLiDAR USB Ports' and copy in the respective information. These files should go into /opt/ros/melodic/share/dynamixel_workbench_controllers and respectively
+18. Go into the dynamixel_controller.launch and test_rplidar.launch files in your NUC's environment and hardcode the symlinks that you just created. This is done by simply writing in /dev/dynamixel and /dev/rplidar into the respective USB port fields.
+19. Once in the dynamixel_controller launch file, you must also set use_cmd_vel to 'true' to be able to control the wheels.
+20. Once everything is configured, you can run the NUC launch file to get all of the components moving! The Dynamixels are teleoperable with the w,a,s,d,x keys and all nodes are live (with the Jetson nodes ssh'd through the NUC ssh-key).
+21. If you're looking to go one step further and visualize the robot's camera and lidar data, this is where the X11 setup really comes in. 
+22. To do so, ssh -Y into the NUC and call roslaunch nuc.launch
+23. Once the program is running, generate a separate NUC terminal and run rviz.
+24. You can visualize the RealSense data (all the way from the Nano!) by inputting 'camera_link' and adding in 'Image'. Designate the Image 'topic' with your desired input and the realtime camera feed should appear in the bottom left screen.
+25. You can add in the laser scan data by then typing 'scan' where camera_link is (the camera feed will stay). Add in the the option 'LaserScan' through the option 'published nodes'. Input its topic as /scan and a laser scan readout should appear.
+26. You can now drive the robot around with realtime camera and laser output.
 
 #### Hello World for Components
 
