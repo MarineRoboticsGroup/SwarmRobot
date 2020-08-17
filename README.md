@@ -221,21 +221,15 @@ RPLidar frame must be broadcasted according to picture shown in rplidar-frame.pn
 
 ## Network setup
 ------------------
-
-1. Set up NUC and Nano with software (Ubuntu 18.04 and ROS). For the Nano, downloading ROS is a little trickier due to its arm-based architecture but JetsonHacks has nice, full software downloads. It's worth noting that the Jetson software can only be booted from a micro-sd card whereas the NUC could boot off of a flash drive. 
-2. Connect the NUC to local wifi and the Nano to NUC via ethernet (Nano doesn't have wifi access).
-3. Set static IP addresses with nm-connection-editor for the NUC and Nano on both wifi and ethernet sides, as IP addresses are dynamically assigned
-4. Set up chrome remote desktop on NUC so you can visualize its GUI. Set up ssh for Nano (chrome remote doesn't support arm-based architecture) with openssh.
-5. Dynamixel and RPLiDAR usb ports are also dynamically assigned on NUC but specific to each component, set symlinks in respective launch files via /etc/udev/rules
-6. Connect to the NUC via chrome remote and ssh into Nano to begin. While the above section on installing all necessary RealSense software is fine, sudo apt-get install ros-melodic-realsense2-camera downloads all necessary software to the Nano.
-7. Set EXPORT ROS_MASTER_URI and EXPORT ROS_IP to Nano's IP address so you can run Rviz from NUC while running the RealSense through the Nano. To launching Nano launch files from NUC requires specific env. variables and a path set with a host key, which is explained in more depth below. 
-
+All main network set up is defined below, in the 'Running' section. Here, you can find more detailed explanations and debugging tips. 
 
 ### Setting Static IP Addresses for the NUC and Nano
 
 Setting the Nano’s IP address permanently was tricky due to the wandering range of IP addresses that the DCHP would accept/look for. Most of the time, the Nano connected to the NUC using 10.42.0.25, but every so often, 10.42.0.26 might be the correct address.
 
 The solution to this is to go into the nm-manager-editor settings on the Nano (through a hard connection to the monitor + keyboard/mouse) and ‘MANUALLY’ setting the IP configuration to 10.42.0.25 through netmask 255.255.255.255 (IPv4 settings).
+
+Reload your new network settings via sudo /etc/init.d/networking restart
 
 ### Registering Dynamixel and RPLiDAR USB Ports
 
@@ -303,9 +297,6 @@ SSH keys won't work by default, e.g. if you already connected to the Jetson thro
 
 ```bash
 ssh -oHostKeyAlgorithms='ssh-rsa' 10.42.0.25
-
-Install realsense camera on NUC so that all of the files are there:
-sudo apt-get install ros-melodic-realsense2-camera
 ``` 
 
 ## Hardware Setup
@@ -399,18 +390,23 @@ Here are the step-by-step instructions for building a swarm robot. Starting from
 12. Run the Nano ROS install file and install bash scripts from 'roboswarm', and make sure to set the files as executable. 
 13. Source and create a catkin workspace for future use and availability. 
 14. Set up the ethernet connection on the Nano's end by editing the connection in nm-connection-editor (sudo nm-connection-editor to edit connection). On the Nano's end, the ethernet is set to DHCP. Restart the network with sudo /etc/init.d/networking restart. If the connection isn't able to turn on, make sure that the NUC is powered on.
-15. If you're working on an Ubuntu machine (the master machine, not the NUC or Nano), X11 is automatically set-up (otherwise you can download an applicable X1 server). With X11, you can work remotely from your pc after this point.
-16. ssh -Y into the NUC (the command looks something like hostname@192.1...). We're using -Y to get the graphical display of the NUC, so we can visualize its GUI and visual outputs.
-17. Create new files as in 'Registering Dynamixel and RPLiDAR USB Ports' and copy in the respective information. These files should go into /opt/ros/melodic/share/dynamixel_workbench_controllers and respectively
-18. Go into the dynamixel_controller.launch and test_rplidar.launch files in your NUC's environment and hardcode the symlinks that you just created. This is done by simply writing in /dev/dynamixel and /dev/rplidar into the respective USB port fields.
-19. Once in the dynamixel_controller launch file, you must also set use_cmd_vel to 'true' to be able to control the wheels.
-20. Once everything is configured, you can run the NUC launch file to get all of the components moving! The Dynamixels are teleoperable with the w,a,s,d,x keys and all nodes are live (with the Jetson nodes ssh'd through the NUC ssh-key).
-21. If you're looking to go one step further and visualize the robot's camera and lidar data, this is where the X11 setup really comes in. 
-22. To do so, ssh -Y into the NUC and call roslaunch nuc.launch
-23. Once the program is running, generate a separate NUC terminal and run rviz.
-24. You can visualize the RealSense data (all the way from the Nano!) by inputting 'camera_link' and adding in 'Image'. Designate the Image 'topic' with your desired input and the realtime camera feed should appear in the bottom left screen.
-25. You can add in the laser scan data by then typing 'scan' where camera_link is (the camera feed will stay). Add in the the option 'LaserScan' through the option 'published nodes'. Input its topic as /scan and a laser scan readout should appear.
-26. You can now drive the robot around with realtime camera and laser output.
+15. Set a static IP address for the Nano, explained in-depth in the Networking section. 
+16. Configure the environment variables and host keys as explained in the Networking section.
+17. If you're working on an Ubuntu machine (the master machine, not the NUC or Nano), X11 is automatically set-up (otherwise you can download an applicable X1 server). With X11, you can work remotely from your pc after this point.
+18. ssh -Y into the NUC (the command looks something like hostname@192.1...). We're using -Y to get the graphical display of the NUC, so we can visualize its GUI and visual outputs.
+19. Add 'export ROS_IP=10.42.0.25' and 'export ROS_MASTER_URI=http://10.42.0.25:11311' to your sourcing, at 'gedit !/.bashrc'. Here, you'll put in the IP address of your current Nano (which you can find via ifconfig).  
+20. Download Dynamixel Wizard 2.0 and register the Dynamixels by scanning for Protocol 2.0, Baud Rate 57600, and port USSB0. Once in, change the first Dynamixel's ID to 2, reverse direction, change Operating Mode to velocity-based (mode 1). Connect the second Dynamixel to the first (to daisy-chain) and keep its ID to 1 and change its Operating Mode as well. 
+21. Create new files as in 'Registering Dynamixel and RPLiDAR USB Ports' and copy in the respective information by following the instructions
+22. Go into the dynamixel_controller.launch and test_rplidar.launch files in your NUC's opt/ros/source... environment and hardcode the symlinks that you just created. This is done by simply writing in /dev/dynamixel and /dev/rplidar into the respective USB port fields.
+23. Once in the dynamixel_controller launch file, you must also set use_cmd_vel to 'true' to be able to control the wheels.
+24. Go into the NUC.launch file to edit the respective IP addresses, which you can find with ifconfig again. 
+25. Once everything is configured, you can run the NUC launch file to get all of the components moving! The Dynamixels are teleoperable with the w,a,s,d,x keys and all nodes are live (with the Jetson nodes ssh'd through the NUC ssh-key).
+26. If you're looking to go one step further and visualize the robot's camera and lidar data, this is where the X11 setup really comes in. 
+27. To do so, ssh -Y into the NUC and call roslaunch nuc.launch
+28. Once the program is running, generate a separate NUC terminal and run rviz.
+29. You can visualize the RealSense data (all the way from the Nano!) by inputting 'camera_link' and adding in 'Image'. Designate the Image 'topic' with your desired input and the realtime camera feed should appear in the bottom left screen.
+30. You can add in the laser scan data by then typing 'scan' where camera_link is (the camera feed will stay). Add in the the option 'LaserScan' through the option 'published nodes'. Input its topic as /scan and a laser scan readout should appear.
+31. You can now drive the robot around with realtime camera and laser output.
 
 #### Hello World for Components
 
