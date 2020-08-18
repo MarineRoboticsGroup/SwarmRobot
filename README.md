@@ -9,27 +9,28 @@ Testing and implementing developed SLAM algorithms is difficult due to the acces
 
 Table of Contents
 --------------------
-
-- [Resources](#resources)
-  * [Dynamixel Instructions](#dynamixel-workbench)
-  * [Intel RealSense Instructions](#ros-wrapper-for-intel-realsense-devices)
-  * [RPLiDAR Instructions](#rplidar-ros-node-and-test-application)
-- [Network Setup](#network-setup)
-  * [Setting Static IP Addresses for the NUC and Nano](#setting-static-ip-addresses-for-the-nuc-and-nano)
-  * [Registering Dynamixel and RPLiDAR USB Ports](#registering-dynamixel-and-rplidar-usb-ports)
-  * [Environment Variables and Host Key Setup](#environment-variables-and-host-key-setup)
-- [Hardware Setup](#hardware-setup)
-  * [Connection Diagram](#connection-diagram)
-  * [Multi-Robot Swarm Connections Diagram](#multi-robot-swarm-connections-diagram)
-- [Software Setup](#software-setup)
-  * [ROS System Architecture Diagram](#ros-system-architecture-diagram)
-  * [Configuring Master Launch File](#configuring-master-launch-file)
 - [Design Principles](#design-principles)
   * [CAD Design on SolidWorks 2018](#cad-design-on-solidworks-2018)
 - [Getting Started](#getting-started)
   * [Setting Up](#setting-up)
-  * [Running](#setting-up)
-   * [Hello World for Components](#hello-world-for-components)
+  * [Complete Instructions](#complete-instructions)
+- [Hardware Setup](#hardware-setup)
+  * [Connection Diagram](#connection-diagram)
+  * [Multi-Robot Swarm Connections Diagram](#multi-robot-swarm-connections-diagram)
+- [Network Setup](#network-setup)
+  * [Setting Static IP Addresses for the NUC and Nano](#setting-static-ip-addresses-for-the-nuc-and-nano)
+  * [Registering Dynamixel and RPLiDAR USB Ports](#registering-dynamixel-and-rplidar-usb-ports)
+  * [Environment Variables and Host Key Setup](#environment-variables-and-host-key-setup)
+- [Software Setup](#software-setup)
+  * [ROS System Architecture Diagram](#ros-system-architecture-diagram)
+  * [Configuring Master Launch File](#configuring-master-launch-file)
+- [Resources](#resources)
+  * [Dynamixel Instructions](#dynamixel-workbench)
+  * [Intel RealSense Instructions](#ros-wrapper-for-intel-realsense-devices)
+  * [RPLiDAR Instructions](#rplidar-ros-node-and-test-application)
+- [Testing](#testing)
+   * [Final Testing](#final-testing)
+   * [Hello World for Individual Components](#hello-world-for-individual-components)
     * [RealSense](#realsense)
     * [Dynamixels](#dynamixels)
     * [RPLiDAR](#rplidar)
@@ -40,6 +41,188 @@ Table of Contents
 - [Authors](#authors)
 - [Credits](#credits)
 - [License](#license)
+
+## Design principles
+-----------------------
+
+1. Indoor SLAM testing
+2. Inexpensive scalability
+3. Robust design
+4. UWB communications
+5. Multiple sensing capabilities and room for more
+6. Modular software programming
+7. Multi-purpose design
+
+Our design is centered around several principles, which are loosely ordered by importance above. Testing capabilities for SLAM were primarily important for research purposes, and scalability for testing swarms. A robust design is critical for repeated testing and multi-purpose experiments. Since our robot design's function is for indoors SLAM, the cheap yet effective ultra wideband was a solution for efficient indoor communications. Working in ROS, keeping the robot's software modular helps debugging while also keeping the system dynamic. 
+
+#### CAD Design on SolidWorks 2018
+![image](https://user-images.githubusercontent.com/66733789/90139314-31badb00-dd46-11ea-90d8-fe72a71b2b9c.png)
+![image](https://user-images.githubusercontent.com/66733789/90139395-4e571300-dd46-11ea-8965-1a4f023bb480.png)
+
+
+## Getting Started
+----------------
+
+### Setting up
+
+All listed components are the main parts of the robot, but other parts are needed for power distribution and connection. These include: one or more power banks with the required ports, barrel jack cables, USB micro cables, USB-C cablesTTL adaptors, sticky velcro tape, wheels, ball caster (for stability), and plates (we custom designed and laser-cut the plates). 
+
+![image](https://user-images.githubusercontent.com/66733789/90140916-69c31d80-dd48-11ea-9a26-2d006f112616.png)
+
+### Complete Instructions
+
+Here are the step-by-step instructions for building a swarm robot. Starting from the finished physical build, you can follow the process to get your first 'hello world' with all components and nodes running together. 
+
+1. Build robot using CAD design, labeled parts, and their corresponding cables. 
+2. Download Ubuntu 18.04 onto a USB-key and boot up NUC with the key. You will need to connect the NUC to a monitor and keyboard, as well as a suitable power source.
+3. Download the Jetson Nano Developer Kit SD Card Image to a micro-SD card (128 GB is more than enough) and follow Nvidia's set-up instructions to boot up the Nano. The Nano must also be connected to the necessary peripherals as above. 
+4. Connect back to the NUC, and connect the NUC to the local network (e.g. home network)
+5. Download Chrome and install SSH through 'sudo apt-get install openssh-server'. 
+6. Clone the SwarmRobot github into your terminal space. 
+7. Run the NUC ROS install file from 'roboswarm' folder. For all files from the SwarmRobot github, make them executable with chmod +x the_file_name to run them.)
+7. Run the NUC install and Nano install bash scripts on the NUC.
+8. Create an ethernet connection between the NUC and Nano using nm-connection-editor. Select ‘connect automatically’ and 'shared to other computers' on the NUC's end and ‘shared to other computers’.
+9. Configure the address network under 'shared to other computers' with Address = 10.42.0.1, Netmask = 255.255.255.0, and Gateway = 10.42.0.1. Restart with sudo /etc/init.d/networking restart back in terminal. 
+10. Connect to the Nano to the display and controls, set up ssh.
+11. Clone into the SwarmRobot Github. 
+12. Run the Nano ROS install file and install bash scripts from 'roboswarm', and make sure to set the files as executable. 
+13. Source and create a catkin workspace for future use and availability. 
+14. Set up the ethernet connection on the Nano's end by editing the connection in nm-connection-editor (sudo nm-connection-editor to edit connection). On the Nano's end, the ethernet is set to DHCP. Restart the network with sudo /etc/init.d/networking restart. If the connection isn't able to turn on, make sure that the NUC is powered on.
+15. Set a static IP address for the Nano, explained in-depth in the Networking section. 
+16. Configure the environment variables and host keys as explained in the Networking section.
+17. If you're working on an Ubuntu machine (the master machine, not the NUC or Nano), X11 is automatically set-up (otherwise you can download an applicable X1 server). With X11, you can work remotely from your pc after this point.
+18. ssh -Y into the NUC (the command looks something like hostname@192.1...). We're using -Y to get the graphical display of the NUC, so we can visualize its GUI and visual outputs.
+19. Add 'export ROS_IP=10.42.0.25' and 'export ROS_MASTER_URI=http://10.42.0.25:11311' to your sourcing, at 'gedit !/.bashrc'. Here, you'll put in the IP address of your current Nano (which you can find via ifconfig).  
+20. Download Dynamixel Wizard 2.0 and register the Dynamixels by scanning for Protocol 2.0, Baud Rate 57600, and port USSB0. Once in, change the first Dynamixel's ID to 2, reverse direction, change Operating Mode to velocity-based (mode 1). Connect the second Dynamixel to the first (to daisy-chain) and keep its ID to 1 and change its Operating Mode as well. 
+21. Create new files as in 'Registering Dynamixel and RPLiDAR USB Ports' and copy in the respective information by following the instructions
+22. Go into the dynamixel_controller.launch and test_rplidar.launch files in your NUC's opt/ros/source... environment and hardcode the symlinks that you just created. This is done by simply writing in /dev/dynamixel and /dev/rplidar into the respective USB port fields.
+23. Once in the dynamixel_controller launch file, you must also set use_cmd_vel to 'true' to be able to control the wheels.
+24. Go into the NUC.launch file to edit the respective IP addresses, which you can find with ifconfig again. 
+
+## Hardware Setup
+-----------------
+
+We based our design around similar principles as the Turtlebot3, a popular industry swarm robot. The major differences between the two are from additional sensing capabilities and different components, e.g. swapping the Jetson Nano for the Raspberry Pi computer. 
+
+![IMG_20200811_091244 (1)](https://user-images.githubusercontent.com/66733789/90140625-0507c300-dd48-11ea-98be-9b012315e0c9.jpg)
+![IMG_20200810_095200](https://user-images.githubusercontent.com/66733789/90140713-1ea90a80-dd48-11ea-95b0-4f4a6d481a8c.jpg)
+
+- (ROS Control Module) Intel NUC7i3DNHNC Mini PC
+- (Computer) Jetson Nano Developer Kit
+- (UWB/Communications) DWM1001 Development Board
+- (Camera) Intel RealSense Depth Camera D435i
+- (LiDAR) DFR0315 RPLIDAR A1 Development Kit
+- (Actuators) Dynamixel XL430-W250-T
+- U2D2*
+- U2D2 Power Hub**
+
+\* U2D2 is needed for Dynamixel-to-computer communication  
+\** U2D2 Power Hub supplies constant power to Dynamixels, necessary for required voltage and current
+
+#### Connection Diagram
+![screenshot](https://user-images.githubusercontent.com/66733789/86042497-3e44d780-ba15-11ea-9029-2bfb11db3b1c.png)
+![image](https://user-images.githubusercontent.com/66733789/90141328-02599d80-dd49-11ea-8848-1765b3c7a7d8.png)
+
+#### Multi-Robot Swarm Connections Diagram
+![Screenshot 2020-06-29 at 5 33 57 PM](https://user-images.githubusercontent.com/66733789/86058475-f632ae80-ba2e-11ea-8996-7b5bd60f3f86.png)
+
+
+## Network setup
+------------------
+All main network set up is defined below, in the 'Running' section. Here, you can find more detailed explanations and debugging tips. 
+
+### Setting Static IP Addresses for the NUC and Nano
+
+Setting the Nano’s IP address permanently was tricky due to the wandering range of IP addresses that the DCHP would accept/look for. Most of the time, the Nano connected to the NUC using 10.42.0.25, but every so often, 10.42.0.26 might be the correct address.
+
+The solution to this is to go into the nm-manager-editor settings on the Nano (through a hard connection to the monitor + keyboard/mouse) and ‘MANUALLY’ setting the IP configuration to 10.42.0.25 through netmask 255.255.255.255 (IPv4 settings).
+
+Reload your new network settings via sudo /etc/init.d/networking restart
+
+### Registering Dynamixel and RPLiDAR USB Ports
+
+As mentioned above, you must register the USB devices (for the Dynamixels and RPLiDAR) robustly so that they have a consistent USB id. This is because the USB devices are assigned dynamically as each device is plugged in e.g. /dev/ttyUSB0, /dev/ttyUSB1 etc…
+
+To solve this, you can update /etc/udev/rules.d/* to match specific devices and create symbolic links:
+/dev/rplidar
+/dev/dynamixel
+
+The two rules used:
+
+99-dynamixel-workbench-cdc.rules
+```bash
+#http://linux-tips.org/t/prevent-modem-manager-to-capture-usb-serial-devices/284/2.
+
+#cp rules /etc/udev/rules.d/
+#sudo udevadm control --reload-rules
+#sudo udevadm trigger
+
+KERNEL=="ttyUSB*", DRIVERS=="ftdi_sio", MODE="0666", ATTR{device/latency_timer}="1", SYMLINK+="dynamixel"
+``` 
+
+88-rplidar.rules
+```bash
+# set the udev rule , make the device_port be fixed by rplidar
+# ref: https://askubuntu.com/questions/1039814/how-to-create-a-udev-rule-for-two-devices-with-the-same-manufacturer-id-product
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE:="0777", SYMLINK+="rplidar"
+``` 
+
+Then to reload:
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+``` 
+
+Then you can specify a port with each command:
+```bash
+roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch use_cmd_vel:=true usb_port:=/dev/dynamixel
+roslaunch rplidar_ros view_rplidar.launch  serial_port:=/dev/rplidar
+``` 
+
+### Environment Variables and Host Key Setup
+
+/opt/ros/melodic/env.sh needs to be edited to include specific environment variables on ~/.bashrc.
+
+export ROS_IP=10.42.0.25
+export ROS_MASTER_URI=http://10.42.0.1:11311
+
+Set up a group with additional machine info then include the file (which is included in the NUC launch file for conveniance). 
+
+```bash
+  <group>
+    <machine name="jetset_nano" address="10.42.0.25" user="sophia" password="sop
+hia" env-loader="/opt/ros/melodic/env.sh" default="true" />
+    <include file="/home/sophia/nanolaunch.launch" />
+  </group>
+``` 
+
+All of the necessary code and configs must be set up on the master node that is invoking things remotely - the NUC in our case. 
+
+More helpful info here:
+http://wiki.ros.org/roslaunch/XML/machine
+
+SSH keys won't work by default, e.g. if you already connected to the Jetson through SSH. ROS needs a very specific kind of key in ~/.ssh/known_hosts. If you get a weird error then you will need to remove this file (or at least the entry for the Jetson if you can find it) and then reconnect per these instructions:
+
+```bash
+ssh -oHostKeyAlgorithms='ssh-rsa' 10.42.0.25
+``` 
+
+## Software Setup
+--------------
+
+The ROS nodes and communications will be running on Ubuntu 18.04 with ROS Melodic. This can also be done using previous versions of Ubuntu and ROS with most available software. Packages available for reference from ROS Wiki are listed below:
+
+- Navigation Stack = http://wiki.ros.org/navigation
+- Dynamixel Workbench Metapackage = http://wiki.ros.org/dynamixel_workbench
+- RPLiDAR = http://wiki.ros.org/rplidar
+- RealSense = http://wiki.ros.org/RealSense
+
+### Configuring Master Launch File
+
+Running multiple launch files with one or more arguments is a little more tricky. We found that you needed to pass in the specific launch file arguments through the component launch files. As an example, setting the USB port for the RPLiDAR isn’t passed in through NUC.launch file, rather you have to go into the test_rplidar.launch file and manually set it through nano test_rplidar.launch, from /dev/ttyUSB0 to /dev/rplidar. 
+
+#### ROS System Architecture Diagram
+![Screenshot 2020-06-29 at 2 37 17 PM](https://user-images.githubusercontent.com/66733789/86043502-d5f6f580-ba16-11ea-907d-89f3ed522685.png)
 
 
 ## Resources
@@ -219,196 +402,21 @@ Notice: the different is serial_baudrate between A1/A2 and A3
 
 RPLidar frame must be broadcasted according to picture shown in rplidar-frame.png
 
-## Network setup
-------------------
-All main network set up is defined below, in the 'Running' section. Here, you can find more detailed explanations and debugging tips. 
+## Testing
+-------------
 
-### Setting Static IP Addresses for the NUC and Nano
+### Final Testing
 
-Setting the Nano’s IP address permanently was tricky due to the wandering range of IP addresses that the DCHP would accept/look for. Most of the time, the Nano connected to the NUC using 10.42.0.25, but every so often, 10.42.0.26 might be the correct address.
+Once everything is configured, you can run the NUC launch file to get all of the components moving! The Dynamixels are teleoperable with the w,a,s,d,x keys and all nodes are live (with the Jetson nodes ssh'd through the NUC ssh-key).
 
-The solution to this is to go into the nm-manager-editor settings on the Nano (through a hard connection to the monitor + keyboard/mouse) and ‘MANUALLY’ setting the IP configuration to 10.42.0.25 through netmask 255.255.255.255 (IPv4 settings).
+If you're looking to go one step further and visualize the robot's camera and lidar data, this is where the X11 setup really comes in. 
+- To do so, ssh -Y into the NUC and call roslaunch nuc.launch
+- Once the program is running, generate a separate NUC terminal and run rviz.
+- You can visualize the RealSense data (all the way from the Nano!) by inputting 'camera_link' and adding in 'Image'. Designate the Image 'topic' with your desired input and the realtime camera feed should appear in the bottom left screen.
+- You can add in the laser scan data by then typing 'scan' where camera_link is (the camera feed will stay). Add in the the option 'LaserScan' through the option 'published nodes'. Input its topic as /scan and a laser scan readout should appear.
+- You can now drive the robot around with realtime camera and laser output.
 
-Reload your new network settings via sudo /etc/init.d/networking restart
-
-### Registering Dynamixel and RPLiDAR USB Ports
-
-As mentioned above, you must register the USB devices (for the Dynamixels and RPLiDAR) robustly so that they have a consistent USB id. This is because the USB devices are assigned dynamically as each device is plugged in e.g. /dev/ttyUSB0, /dev/ttyUSB1 etc…
-
-To solve this, you can update /etc/udev/rules.d/* to match specific devices and create symbolic links:
-/dev/rplidar
-/dev/dynamixel
-
-The two rules used:
-
-99-dynamixel-workbench-cdc.rules
-```bash
-#http://linux-tips.org/t/prevent-modem-manager-to-capture-usb-serial-devices/284/2.
-
-#cp rules /etc/udev/rules.d/
-#sudo udevadm control --reload-rules
-#sudo udevadm trigger
-
-KERNEL=="ttyUSB*", DRIVERS=="ftdi_sio", MODE="0666", ATTR{device/latency_timer}="1", SYMLINK+="dynamixel"
-``` 
-
-88-rplidar.rules
-```bash
-# set the udev rule , make the device_port be fixed by rplidar
-# ref: https://askubuntu.com/questions/1039814/how-to-create-a-udev-rule-for-two-devices-with-the-same-manufacturer-id-product
-KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE:="0777", SYMLINK+="rplidar"
-``` 
-
-Then to reload:
-```bash
-sudo udevadm control --reload-rules
-sudo udevadm trigger
-``` 
-
-Then you can specify a port with each command:
-```bash
-roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch use_cmd_vel:=true usb_port:=/dev/dynamixel
-roslaunch rplidar_ros view_rplidar.launch  serial_port:=/dev/rplidar
-``` 
-
-### Environment Variables and Host Key Setup
-
-/opt/ros/melodic/env.sh needs to be edited to include specific environment variables on ~/.bashrc.
-
-export ROS_IP=10.42.0.25
-export ROS_MASTER_URI=http://10.42.0.1:11311
-
-Set up a group with additional machine info then include the file (which is included in the NUC launch file for conveniance). 
-
-```bash
-  <group>
-    <machine name="jetset_nano" address="10.42.0.25" user="sophia" password="sop
-hia" env-loader="/opt/ros/melodic/env.sh" default="true" />
-    <include file="/home/sophia/nanolaunch.launch" />
-  </group>
-``` 
-
-All of the necessary code and configs must be set up on the master node that is invoking things remotely - the NUC in our case. 
-
-More helpful info here:
-http://wiki.ros.org/roslaunch/XML/machine
-
-SSH keys won't work by default, e.g. if you already connected to the Jetson through SSH. ROS needs a very specific kind of key in ~/.ssh/known_hosts. If you get a weird error then you will need to remove this file (or at least the entry for the Jetson if you can find it) and then reconnect per these instructions:
-
-```bash
-ssh -oHostKeyAlgorithms='ssh-rsa' 10.42.0.25
-``` 
-
-## Hardware Setup
------------------
-
-We based our design around similar principles as the Turtlebot3, a popular industry swarm robot. The major differences between the two are from additional sensing capabilities and different components, e.g. swapping the Jetson Nano for the Raspberry Pi computer. 
-
-![IMG_20200811_091244 (1)](https://user-images.githubusercontent.com/66733789/90140625-0507c300-dd48-11ea-98be-9b012315e0c9.jpg)
-![IMG_20200810_095200](https://user-images.githubusercontent.com/66733789/90140713-1ea90a80-dd48-11ea-95b0-4f4a6d481a8c.jpg)
-
-- (ROS Control Module) Intel NUC7i3DNHNC Mini PC
-- (Computer) Jetson Nano Developer Kit
-- (UWB/Communications) DWM1001 Development Board
-- (Camera) Intel RealSense Depth Camera D435i
-- (LiDAR) DFR0315 RPLIDAR A1 Development Kit
-- (Actuators) Dynamixel XL430-W250-T
-- U2D2*
-- U2D2 Power Hub**
-
-\* U2D2 is needed for Dynamixel-to-computer communication  
-\** U2D2 Power Hub supplies constant power to Dynamixels, necessary for required voltage and current
-
-#### Connection Diagram
-![screenshot](https://user-images.githubusercontent.com/66733789/86042497-3e44d780-ba15-11ea-9029-2bfb11db3b1c.png)
-![image](https://user-images.githubusercontent.com/66733789/90141328-02599d80-dd49-11ea-8848-1765b3c7a7d8.png)
-
-#### Multi-Robot Swarm Connections Diagram
-![Screenshot 2020-06-29 at 5 33 57 PM](https://user-images.githubusercontent.com/66733789/86058475-f632ae80-ba2e-11ea-8996-7b5bd60f3f86.png)
-
-
-## Software Setup
---------------
-
-The ROS nodes and communications will be running on Ubuntu 18.04 with ROS Melodic. This can also be done using previous versions of Ubuntu and ROS with most available software. Packages available for reference from ROS Wiki are listed below:
-
-- Navigation Stack = http://wiki.ros.org/navigation
-- Dynamixel Workbench Metapackage = http://wiki.ros.org/dynamixel_workbench
-- RPLiDAR = http://wiki.ros.org/rplidar
-- RealSense = http://wiki.ros.org/RealSense
-
-### Configuring Master Launch File
-
-Running multiple launch files with one or more arguments is a little more tricky. We found that you needed to pass in the specific launch file arguments through the component launch files. As an example, setting the USB port for the RPLiDAR isn’t passed in through NUC.launch file, rather you have to go into the test_rplidar.launch file and manually set it through nano test_rplidar.launch.
-
-#### ROS System Architecture Diagram
-![Screenshot 2020-06-29 at 2 37 17 PM](https://user-images.githubusercontent.com/66733789/86043502-d5f6f580-ba16-11ea-907d-89f3ed522685.png)
-
-## Design principles
------------------------
-
-1. Indoor SLAM testing
-2. Inexpensive scalability
-3. Robust design
-4. UWB communications
-5. Multiple sensing capabilities and room for more
-6. Modular software programming
-7. Multi-purpose design
-
-Our design is centered around several principles, which are loosely ordered by importance above. Testing capabilities for SLAM were primarily important for research purposes, and scalability for testing swarms. A robust design is critical for repeated testing and multi-purpose experiments. Since our robot design's function is for indoors SLAM, the cheap yet effective ultra wideband was a solution for efficient indoor communications. Working in ROS, keeping the robot's software modular helps debugging while also keeping the system dynamic. 
-
-#### CAD Design on SolidWorks 2018
-![image](https://user-images.githubusercontent.com/66733789/90139314-31badb00-dd46-11ea-90d8-fe72a71b2b9c.png)
-![image](https://user-images.githubusercontent.com/66733789/90139395-4e571300-dd46-11ea-8965-1a4f023bb480.png)
-
-## Getting Started
-----------------
-
-### Setting up
-
-All listed components are the main parts of the robot, but other parts are needed for power distribution and connection. These include: one or more power banks with the required ports, barrel jack cables, USB micro cables, USB-C cablesTTL adaptors, sticky velcro tape, wheels, ball caster (for stability), and plates (we custom designed and laser-cut the plates). 
-(Currently incomplete)
-
-![image](https://user-images.githubusercontent.com/66733789/90140916-69c31d80-dd48-11ea-9a26-2d006f112616.png)
-
-### Running
-
-Here are the step-by-step instructions for building a swarm robot. Starting from the finished physical build, you can follow the process to get your first 'hello world' with all components and nodes running together. 
-
-1. Build robot using CAD design, labeled parts, and their corresponding cables. 
-2. Download Ubuntu 18.04 onto a USB-key and boot up NUC with the key. You will need to connect the NUC to a monitor and keyboard, as well as a suitable power source.
-3. Download the Jetson Nano Developer Kit SD Card Image to a micro-SD card (128 GB is more than enough) and follow Nvidia's set-up instructions to boot up the Nano. The Nano must also be connected to the necessary peripherals as above. 
-4. Connect back to the NUC, and connect the NUC to the local network (e.g. home network)
-5. Download Chrome and install SSH through 'sudo apt-get install openssh-server'. 
-6. Clone the SwarmRobot github into your terminal space. 
-7. Run the NUC ROS install file from 'roboswarm' folder. For all files from the SwarmRobot github, make them executable with chmod +x the_file_name to run them.)
-7. Run the NUC install and Nano install bash scripts on the NUC.
-8. Create an ethernet connection between the NUC and Nano using nm-connection-editor. Select ‘connect automatically’ and 'shared to other computers' on the NUC's end and ‘shared to other computers’.
-9. Configure the address network under 'shared to other computers' with Address = 10.42.0.1, Netmask = 255.255.255.0, and Gateway = 10.42.0.1. Restart with sudo /etc/init.d/networking restart back in terminal. 
-10. Connect to the Nano to the display and controls, set up ssh.
-11. Clone into the SwarmRobot Github. 
-12. Run the Nano ROS install file and install bash scripts from 'roboswarm', and make sure to set the files as executable. 
-13. Source and create a catkin workspace for future use and availability. 
-14. Set up the ethernet connection on the Nano's end by editing the connection in nm-connection-editor (sudo nm-connection-editor to edit connection). On the Nano's end, the ethernet is set to DHCP. Restart the network with sudo /etc/init.d/networking restart. If the connection isn't able to turn on, make sure that the NUC is powered on.
-15. Set a static IP address for the Nano, explained in-depth in the Networking section. 
-16. Configure the environment variables and host keys as explained in the Networking section.
-17. If you're working on an Ubuntu machine (the master machine, not the NUC or Nano), X11 is automatically set-up (otherwise you can download an applicable X1 server). With X11, you can work remotely from your pc after this point.
-18. ssh -Y into the NUC (the command looks something like hostname@192.1...). We're using -Y to get the graphical display of the NUC, so we can visualize its GUI and visual outputs.
-19. Add 'export ROS_IP=10.42.0.25' and 'export ROS_MASTER_URI=http://10.42.0.25:11311' to your sourcing, at 'gedit !/.bashrc'. Here, you'll put in the IP address of your current Nano (which you can find via ifconfig).  
-20. Download Dynamixel Wizard 2.0 and register the Dynamixels by scanning for Protocol 2.0, Baud Rate 57600, and port USSB0. Once in, change the first Dynamixel's ID to 2, reverse direction, change Operating Mode to velocity-based (mode 1). Connect the second Dynamixel to the first (to daisy-chain) and keep its ID to 1 and change its Operating Mode as well. 
-21. Create new files as in 'Registering Dynamixel and RPLiDAR USB Ports' and copy in the respective information by following the instructions
-22. Go into the dynamixel_controller.launch and test_rplidar.launch files in your NUC's opt/ros/source... environment and hardcode the symlinks that you just created. This is done by simply writing in /dev/dynamixel and /dev/rplidar into the respective USB port fields.
-23. Once in the dynamixel_controller launch file, you must also set use_cmd_vel to 'true' to be able to control the wheels.
-24. Go into the NUC.launch file to edit the respective IP addresses, which you can find with ifconfig again. 
-25. Once everything is configured, you can run the NUC launch file to get all of the components moving! The Dynamixels are teleoperable with the w,a,s,d,x keys and all nodes are live (with the Jetson nodes ssh'd through the NUC ssh-key).
-26. If you're looking to go one step further and visualize the robot's camera and lidar data, this is where the X11 setup really comes in. 
-27. To do so, ssh -Y into the NUC and call roslaunch nuc.launch
-28. Once the program is running, generate a separate NUC terminal and run rviz.
-29. You can visualize the RealSense data (all the way from the Nano!) by inputting 'camera_link' and adding in 'Image'. Designate the Image 'topic' with your desired input and the realtime camera feed should appear in the bottom left screen.
-30. You can add in the laser scan data by then typing 'scan' where camera_link is (the camera feed will stay). Add in the the option 'LaserScan' through the option 'published nodes'. Input its topic as /scan and a laser scan readout should appear.
-31. You can now drive the robot around with realtime camera and laser output.
-
-#### Hello World for Components
+#### Hello World for Individual Components
 
 Hello World for Components: Basic control with individual components
 
@@ -468,7 +476,7 @@ This changes the permissions of RPLiDAR rules file from 0777 to 0666, as it auto
 
 #### Registering Dynamixels
 
-As mentioned above, you can register and configure the Dynamixel motors using DYnamixel Wizard 2.0. This was the most simple platform for a quick set-up, and runs on Windows, Linux, and Mac. 
+As mentioned above, you can register and configure the Dynamixel motors using Dynamixel Wizard 2.0. This was the most simple platform for a quick set-up, and runs on Windows, Linux, and Mac. 
 
 - Set up the Dynamixels with the U2D2, U2D2 Power Hub, and the power source.
 - Select Dynamixel X and port COM4 (or the port that the Dynamixel automatically connects to via USB)
