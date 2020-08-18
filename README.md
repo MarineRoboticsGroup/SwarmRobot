@@ -75,31 +75,35 @@ All listed components are the main parts of the robot, but other parts are neede
 
 Here are the step-by-step instructions for building a swarm robot. Starting from the finished physical build, you can follow the process to get your first official test and 'hello world' with all components and nodes running together. Each step is explained in further detail below, where the individual sections on hardware/build, networking, software, and troubleshooting are expanded on. 
 
-1. Build the robot using CAD design, labeled parts, and their corresponding cables. A full list of the components is available on the Drive, as well as in the hardware section.
+1. Build the robot using CAD design, labeled parts, and their corresponding cables. A full list of the components is available on the Drive, as well as in the hardware section below.
 2. Download Ubuntu 18.04 onto a USB-key and boot up NUC with the key. You will need to connect the NUC to a monitor and keyboard, as well as a suitable power source.
 3. Download the Jetson Nano Developer Kit SD Card Image to a micro-SD card (128 GB is more than enough) and follow Nvidia's set-up instructions to boot up the Nano. The Nano must also be connected to the necessary peripherals as above. 
-4. Connect back to the NUC, and connect the NUC to the local network (e.g. home network)
+4. Connect back to the NUC, and connect the NUC to the local network (e.g. home network).
 5. Download Chrome and install SSH through 'sudo apt-get install openssh-server'. 
 6. Clone the SwarmRobot github into your terminal space. 
 7. Run the NUC ROS install file from 'roboswarm' folder. For all files from the SwarmRobot github, make them executable with chmod +x the_file_name to run them.)
-7. Run the NUC install and Nano install bash scripts on the NUC.
-8. Create an ethernet connection between the NUC and Nano using nm-connection-editor. Select ‘connect automatically’ and 'shared to other computers' on the NUC's end and ‘shared to other computers’.
-9. Configure the address network under 'shared to other computers' with Address = 10.42.0.1, Netmask = 255.255.255.0, and Gateway = 10.42.0.1. Restart with sudo /etc/init.d/networking restart back in terminal. 
+7. Run the NUC install and Nano install bash scripts on the NUC, as the control pc needs both the NUC and Nano's install software. 
+8. Connect the NUC and Nano via ethernet cable, and create an ethernet connection using nm-connection-editor (sudo nm-connection-editor to edit connection). Select ‘connect automatically’ and 'shared to other computers' on the NUC's end and ‘shared to other computers’.
+9. Configure the address network under 'shared to other computers' with Address = 10.42.0.1, Netmask = 255.255.255.0, and Gateway = 10.42.0.1. Restart with 'sudo /etc/init.d/networking restart' back in terminal. 
 10. Connect to the Nano to the display and controls, set up ssh.
 11. Clone into the SwarmRobot Github. 
-12. Run the Nano ROS install file and install bash scripts from 'roboswarm', and make sure to set the files as executable. 
-13. Source and create a catkin workspace for future use and availability. 
-14. Set up the ethernet connection on the Nano's end by editing the connection in nm-connection-editor (sudo nm-connection-editor to edit connection). On the Nano's end, the ethernet is set to DHCP. Restart the network with sudo /etc/init.d/networking restart. If the connection isn't able to turn on, make sure that the NUC is powered on.
-15. Set a static IP address for the Nano, explained in-depth in the Networking section. 
-16. Configure the environment variables and host keys as explained in the Networking section.
-17. If you're working on an Ubuntu machine (the master machine, not the NUC or Nano), X11 is automatically set-up (otherwise you can download an applicable X1 server). With X11, you can work remotely from your pc after this point.
+12. Run the Nano ROS install file and Nano install bash scripts from the cloned repository, and make sure to set the files as executable. 
+13. Source and create a catkin workspace for future use and availability (you can follow ROS Wiki's detailed instructions for creating a catkin workspace).
+14. Set up the ethernet connection on the Nano's end by editing the connection in nm-connection-editor (sudo nm-connection-editor to edit connection). On the Nano's end, the ethernet is set to 'Automatic (DHCP)'. Restart the network with 'sudo /etc/init.d/networking restart'. If the connection isn't able to turn on, make sure that the NUC is powered on.
+15. Set a static IP address for the Nano, explained in-depth in the Networking section. This is critical for connecting to and communicating with the Nano, as its IP address can shift to a range of IDs. 
+16. Configure the system's environment variables and host keys as explained in the Networking section.
+17. If you're working on an Ubuntu machine (the remote control machine, not the NUC or Nano), X11 is automatically set-up (otherwise you can download an applicable X1 server). With ssh, you can work remotely from your pc after this point. X11 will become important with testing, as explained in the Final Tests section. 
 18. ssh -Y into the NUC (the command looks something like hostname@192.1...). We're using -Y to get the graphical display of the NUC, so we can visualize its GUI and visual outputs.
 19. Add 'export ROS_IP=10.42.0.25' and 'export ROS_MASTER_URI=http://10.42.0.25:11311' to your sourcing, at 'gedit !/.bashrc'. Here, you'll put in the IP address of your current Nano (which you can find via ifconfig).  
-20. Download Dynamixel Wizard 2.0 and register the Dynamixels by scanning for Protocol 2.0, Baud Rate 57600, and port USSB0. Once in, change the first Dynamixel's ID to 2, reverse direction, change Operating Mode to velocity-based (mode 1). Connect the second Dynamixel to the first (to daisy-chain) and keep its ID to 1 and change its Operating Mode as well. 
-21. Create new files as in 'Registering Dynamixel and RPLiDAR USB Ports' and copy in the respective information by following the instructions
-22. Go into the dynamixel_controller.launch and test_rplidar.launch files in your NUC's opt/ros/source... environment and hardcode the symlinks that you just created. This is done by simply writing in /dev/dynamixel and /dev/rplidar into the respective USB port fields.
+20. Download Dynamixel Wizard 2.0 and register the Dynamixels by scanning for Protocol 2.0, Baud Rate 57600, and port USB0. 
+21. Once in, change the first Dynamixel's ID to 2, reverse direction, change Operating Mode to velocity-based (mode 1). Connect the second Dynamixel to the first (to daisy-chain their communication and power sources ) and keep its ID to 1 and change its Operating Mode as well. 
+22. Create new files as in 'Registering Dynamixel and RPLiDAR USB Ports' and copy in the respective information by following the instructions.
+23. Go into the dynamixel_controller.launch and test_rplidar.launch files in your NUC's opt/ros/source... environment and hardcode the symlinks that you just created. This is done by simply writing in /dev/dynamixel and /dev/rplidar into the respective USB port fields, once again explained below in 'Registering Dynamixel and RPLiDAR USB Ports'.  
 23. Once in the dynamixel_controller launch file, you must also set use_cmd_vel to 'true' to be able to control the wheels.
-24. Go into the NUC.launch file to edit the respective IP addresses, which you can find with ifconfig again. 
+
+This is the basic step-by-step guide to getting your Swarm Robot up and running! To begin testing and modifying the components, the next steps are explained in 'Testing'. Many of the above steps are reiterated and expanded on in later sections, but this beginning list is a good resource for general steps. The next few sections cover specific steps and troubleshooting tips, with a larger troubleshooting section at the end of this document. 
+
+If you have any questions, there are many great resources (including but not limited to): ROS Wiki, JetsonHacks, RealSense repo, Dynamxiel repo, Dynamixel Workbench e-manual, Nvidia forums, Stack Overflow, and general search queries. The MRG Drive also has additional resources and in-depth explanations. Feel free to reach out as well, either with Slack or through GMail, to the author. 
 
 ## Hardware Setup
 -----------------
