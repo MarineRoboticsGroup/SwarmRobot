@@ -45,6 +45,8 @@ Table of Contents
 ## Design principles
 -----------------------
 
+To accomplish our goal of designing and building a scalable robot with OTS technology for testing SLAM research through ROS-based software, there were several higher and lower-priority criteria. 
+
 1. Indoor SLAM testing
 2. Inexpensive scalability
 3. Robust design
@@ -65,15 +67,15 @@ Our design is centered around several principles, which are loosely ordered by i
 
 ### Setting up
 
-All listed components are the main parts of the robot, but other parts are needed for power distribution and connection. These include: one or more power banks with the required ports, barrel jack cables, USB micro cables, USB-C cablesTTL adaptors, sticky velcro tape, wheels, ball caster (for stability), and plates (we custom designed and laser-cut the plates). 
+All listed components are the main parts of the robot, but other parts are needed for power distribution and connection. These include: one or more power banks with the required ports, custom JST connectors, barrel jack cables, USB-micro cables, USB-C cables, USB-TTL adaptors, hook and loop velcro tape, wheels, ball caster (for stability), and plates (we custom designed and laser-cut the plates). 
 
 ![image](https://user-images.githubusercontent.com/66733789/90140916-69c31d80-dd48-11ea-9a26-2d006f112616.png)
 
 ### Complete Instructions
 
-Here are the step-by-step instructions for building a swarm robot. Starting from the finished physical build, you can follow the process to get your first 'hello world' with all components and nodes running together. 
+Here are the step-by-step instructions for building a swarm robot. Starting from the finished physical build, you can follow the process to get your first official test and 'hello world' with all components and nodes running together. Each step is explained in further detail below, where the individual sections on hardware/build, networking, software, and troubleshooting are expanded on. 
 
-1. Build robot using CAD design, labeled parts, and their corresponding cables. 
+1. Build the robot using CAD design, labeled parts, and their corresponding cables. A full list of the components is available on the Drive, as well as in the hardware section.
 2. Download Ubuntu 18.04 onto a USB-key and boot up NUC with the key. You will need to connect the NUC to a monitor and keyboard, as well as a suitable power source.
 3. Download the Jetson Nano Developer Kit SD Card Image to a micro-SD card (128 GB is more than enough) and follow Nvidia's set-up instructions to boot up the Nano. The Nano must also be connected to the necessary peripherals as above. 
 4. Connect back to the NUC, and connect the NUC to the local network (e.g. home network)
@@ -107,17 +109,37 @@ We based our design around similar principles as the Turtlebot3, a popular indus
 ![IMG_20200811_091244 (1)](https://user-images.githubusercontent.com/66733789/90140625-0507c300-dd48-11ea-98be-9b012315e0c9.jpg)
 ![IMG_20200810_095200](https://user-images.githubusercontent.com/66733789/90140713-1ea90a80-dd48-11ea-95b0-4f4a6d481a8c.jpg)
 
+Main Parts:
+
 - (ROS Control Module) Intel NUC7i3DNHNC Mini PC
 - (Computer) Jetson Nano Developer Kit
 - (UWB/Communications) DWM1001 Development Board
 - (Camera) Intel RealSense Depth Camera D435i
 - (LiDAR) DFR0315 RPLIDAR A1 Development Kit
 - (Actuators) Dynamixel XL430-W250-T
-- U2D2*
-- U2D2 Power Hub**
+- (Actuator Comms) U2D2*
+- (Actuator Power) U2D2 Power Hub**
+- (Battery #1) MaxOak 185Wh/50000mAh Power Bank
+- (Battery #2) Sinkeu Power Bank
+- (Robot Balance) Ball Caster
+- (Robot Movement) Wheels + Tires
 
 \* U2D2 is needed for Dynamixel-to-computer communication  
 \** U2D2 Power Hub supplies constant power to Dynamixels, necessary for required voltage and current
+
+Cables: 
+- (NUC-UWB) USB-TTL Cable
+- (NUC-Nano) Ethernet Cable
+- (NUC-UWB) USB-micro Cable
+- (NUC-DYN) USB-micro Cable
+- (NUC-RPLiDAR) USB-micro Cable
+- (DYN-DYN) JST Cable
+- (DYN-U2D2) JST Cable
+- (U2D2-PHB) JST Cable
+- (NUC-MaxOak) Barrel Jack Connector
+- (DYN-MaxOak) Barrel Jack Connector
+- (Nano-SinKeu) USB-micro Cable
+- (RealSense-Nano) USB-c Cable
 
 #### Connection Diagram
 ![screenshot](https://user-images.githubusercontent.com/66733789/86042497-3e44d780-ba15-11ea-9029-2bfb11db3b1c.png)
@@ -129,7 +151,7 @@ We based our design around similar principles as the Turtlebot3, a popular indus
 
 ## Network setup
 ------------------
-All main network set up is defined below, in the 'Running' section. Here, you can find more detailed explanations and debugging tips. 
+The step-by-step network set up is defined above, in the 'Getting Started' section. Here, you can find more detailed explanations and debugging tips. 
 
 ### Setting Static IP Addresses for the NUC and Nano
 
@@ -181,7 +203,7 @@ roslaunch rplidar_ros view_rplidar.launch  serial_port:=/dev/rplidar
 
 ### Environment Variables and Host Key Setup
 
-/opt/ros/melodic/env.sh needs to be edited to include specific environment variables on ~/.bashrc.
+To visualize the Nano and NUC's displays while controlling the robot, a few variables and exports need to be set up. The main variable file in /opt/ros/melodic/env.sh needs to be edited to include specific environment variables on ~/.bashrc.
 
 export ROS_IP=10.42.0.25
 export ROS_MASTER_URI=http://10.42.0.1:11311
@@ -201,7 +223,9 @@ All of the necessary code and configs must be set up on the master node that is 
 More helpful info here:
 http://wiki.ros.org/roslaunch/XML/machine
 
-SSH keys won't work by default, e.g. if you already connected to the Jetson through SSH. ROS needs a very specific kind of key in ~/.ssh/known_hosts. If you get a weird error then you will need to remove this file (or at least the entry for the Jetson if you can find it) and then reconnect per these instructions:
+SSH keys won't work by default, e.g. if you already connected to the Jetson through SSH. ROS needs a very specific kind of key in ~/.ssh/known_hosts. 
+
+If you get a weird error then you will need to remove this file (or at least the entry for the Jetson if you can find it) and then reconnect per these instructions:
 
 ```bash
 ssh -oHostKeyAlgorithms='ssh-rsa' 10.42.0.25
@@ -210,7 +234,7 @@ ssh -oHostKeyAlgorithms='ssh-rsa' 10.42.0.25
 ## Software Setup
 --------------
 
-The ROS nodes and communications will be running on Ubuntu 18.04 with ROS Melodic. This can also be done using previous versions of Ubuntu and ROS with most available software. Packages available for reference from ROS Wiki are listed below:
+The ROS nodes and communications will be running on Ubuntu 18.04 with ROS Melodic. This can also be configured using previous versions of Ubuntu and ROS with most available software. Packages available for reference from ROS Wiki are listed below:
 
 - Navigation Stack = http://wiki.ros.org/navigation
 - Dynamixel Workbench Metapackage = http://wiki.ros.org/dynamixel_workbench
@@ -219,7 +243,9 @@ The ROS nodes and communications will be running on Ubuntu 18.04 with ROS Melodi
 
 ### Configuring Master Launch File
 
-Running multiple launch files with one or more arguments is a little more tricky. We found that you needed to pass in the specific launch file arguments through the component launch files. As an example, setting the USB port for the RPLiDAR isn’t passed in through NUC.launch file, rather you have to go into the test_rplidar.launch file and manually set it through nano test_rplidar.launch, from /dev/ttyUSB0 to /dev/rplidar. 
+Running multiple launch files with one or more arguments is a little more tricky. We found that you needed to pass in the specific launch file arguments through the component launch files. The minimum format for the master launch file is included in this repository, 'NUC.launch'. Since this is the master launch file, it also loops in the Nano's launch file, 'Nano.launch'. Instructions on setting up this exchange are explained in the 'Setting-Up' section, with a few troubleshooting tips below. 
+
+As an example, setting the USB port for the RPLiDAR isn’t passed in through NUC.launch file, rather you have to go into the test_rplidar.launch file and manually set it through nano test_rplidar.launch, from /dev/ttyUSB0 to /dev/rplidar. 
 
 #### ROS System Architecture Diagram
 ![Screenshot 2020-06-29 at 2 37 17 PM](https://user-images.githubusercontent.com/66733789/86043502-d5f6f580-ba16-11ea-907d-89f3ed522685.png)
@@ -230,8 +256,7 @@ Running multiple launch files with one or more arguments is a little more tricky
 ### Dynamixel Workbench
 ----------------------
 
-Control and communication between Dynamixel motors, which can be controlled as one or daisy-chained together for shared power and movement. Deciding on software platforms largely depends on three things: type of Dynamixel motor, other components, and software configuration. Our software was built using the Dynamixel Workbench due to larger control over the adjustments and fine-tuning. 
-(Full workbench can be found at https://github.com/MarineRoboticsGroup/dynamixel-workbench) 
+This borrowed repository covers control and communication between Dynamixel motors, which can be done with one or daisy-chained together for shared power and movement. Deciding on software platforms largely depends on three things: type of Dynamixel motor, other components, and software configuration. Our system architecture was built using the Dynamixel Workbench due to larger control over the adjustments and fine-tuning. We suggest going through the Dynamixel Workbench for full instructions and support. 
 
 #### ROBOTIS e-Manual for Dynamixel Workbench
 - [ROBOTIS e-Manual for Dynamixel Workbench](http://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_workbench/)
@@ -258,9 +283,10 @@ Control and communication between Dynamixel motors, which can be controlled as o
 - [ROBOTIS e-Manual for OpenManipulator](http://emanual.robotis.com/docs/en/platform/openmanipulator/)
 - [ROBOTIS e-Manual for OpenCR](http://emanual.robotis.com/docs/en/parts/controller/opencr10/)
 
-Following the steps outlined in the Dynamixel Workbench e-manual worked successfully for us. Configuring the environment and packages for ROS was relatively simple, and it was possible to test the Dynamixels from the computer after a few tweaks outlined in debugging. These are important debugging steps that utilize Dynamixel Wizard 2.0 (available on Windows, Linux, and Mac) for configuring the motors before they can communicate with the NUC remotely. 
+Following the steps outlined in the Dynamixel Workbench e-manual worked successfully for us. Configuring the environment and packages for ROS was relatively simple, and it was possible to test the Dynamixels from the computer after a few tweaks outlined in debugging. These are important debugging steps that utilize Dynamixel Wizard 2.0 (available on Windows, Linux, and Mac) for long-term motor configuration before they can communicate with the NUC remotely. 
 
 Once properly set up (either with test computer or NUC), the Dynamixels can be controlled from the keyboard with a few Linux commands. 
+
 ```bash
 $ cd ~/catkin_ws && catkin_make
 $ roslaunch dynamixel_workbench_operators wheel_operator.launch
@@ -270,7 +296,7 @@ $ roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch use_cmd
 ### ROS Wrapper for Intel RealSense Devices
 -------------------------------------------------------
 
-The Intel RealSense is a great camera for high quality RGB and depth streams for 3D scanning and video capture. The integrated IMU sensor allows for improved navigation capabilities. We went with the RealSense 435i for its global shuttering and larger field of view.  
+The Intel RealSense is a great camera for high quality RGB and depth streams for 3D scanning and video capture. The integrated IMU sensor allows for improved navigation capabilities and motion tracking, useful for any SLAM testing. We went with the RealSense 435i for its global shuttering and larger field of view.  
 (Full workbench can be found at https://github.com/IntelRealSense/realsense-ros) 
 
 LibRealSense supported version: v2.29.0 (see [realsense2_camera release notes](https://github.com/IntelRealSense/realsense-ros/releases))
@@ -286,7 +312,7 @@ OR
 - Build from sources by downloading the latest [Intel&reg; RealSense&trade; SDK 2.0](https://github.com/IntelRealSense/librealsense/releases/tag/v2.29.0) and follow the instructions under [Linux Installation](https://github.com/IntelRealSense/librealsense/blob/master/doc/installation.md)
 
 Step 2: Install the ROS distribution
-- Install [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu), on Ubuntu 16.04
+- Install [ROS Melodic](http://wiki.ros.org/melodic/Installation/Ubuntu), on Ubuntu 18.04
 
 Step 3: Install Intel&reg; RealSense&trade; ROS from Sources
 - Create a [catkin](http://wiki.ros.org/catkin#Installing_catkin) workspace
@@ -361,32 +387,31 @@ After running the above command with D435i attached, the following list of topic
 ### RPLiDAR ROS Node and Test Application
 ----------------------------------------------
 
-The RPLiDAR A1M8 from Roboshop is a great, inexpensive LiDAR with 360 degree FOV and a large ranging distance that integrates with SLAMAlg. It is also used on the TurtleBot3 Burger. 
-Full workbench can be found at https://github.com/robopeak/rplidar_ros) 
+The RPLiDAR A1M8 from Roboshop is a great, inexpensive LiDAR with 360 degree FOV and a large ranging distance that integrates with SLAMAlg. It is also used on the TurtleBot3 Burger. Full workbench can be found at https://github.com/robopeak/rplidar_ros) 
 
-Visit following Website for more details about RPLIDAR:
+Visit following websites for more details about RPLIDAR:
 
 - [rplidar roswiki](http://wiki.ros.org/rplidar)
 - [rplidar HomePage](http://www.slamtec.com/en/Lidar)
 - [rplidar SDK](https://github.com/Slamtec/rplidar_sdk)
 - [rplidar Tutorial](https://github.com/robopeak/rplidar_ros/wiki)
 
-#### How to build rplidar ros package
+#### How to build RPLiDAR ros package
     1) Clone this project to your catkin's workspace src folder
     2) Running catkin_make to build rplidarNode and rplidarNodeClient
 
-#### How to run rplidar ros package
+#### How to run RPLIDAR ROS package
 
-There're two ways to run rplidar ros package
+There are two ways to run RPLIDAR ROS package
 
-#### 1. Run rplidar node and view in the rviz
+#### 1. Run RPLIDAR node and view in rviz
 roslaunch rplidar_ros view_rplidar.launch (for RPLIDAR A1/A2)
 or
 roslaunch rplidar_ros view_rplidar_a3.launch (for RPLIDAR A3)
 
 You should see rplidar's scan result in the rviz.
 
-#### 2. Run rplidar node and view using test application
+#### 2. Run RPLIDAR node and view using test application
 
 roslaunch rplidar_ros rplidar.launch (for RPLIDAR A1/A2)
 or
@@ -407,20 +432,19 @@ RPLidar frame must be broadcasted according to picture shown in rplidar-frame.pn
 
 ### Final Testing
 
-Once everything is configured, you can run the NUC launch file to get all of the components moving! The Dynamixels are teleoperable with the w,a,s,d,x keys and all nodes are live (with the Jetson nodes ssh'd through the NUC ssh-key).
+Once everything is configured, you can run the NUC launch file to get all of the components moving! The Dynamixels are teleoperable with the w,a,s,d,x keys and all nodes are live (with the Jetson nodes ssh'd through the NUC ssh-key). If you're looking to go one step further and visualize the robot's camera and lidar data, this is where the X11 setup really comes in. 
 
-If you're looking to go one step further and visualize the robot's camera and lidar data, this is where the X11 setup really comes in. 
-- To do so, ssh -Y into the NUC and call roslaunch nuc.launch
+To do so, ssh -Y into the NUC and call roslaunch nuc.launch
 - Once the program is running, generate a separate NUC terminal and run rviz.
 - You can visualize the RealSense data (all the way from the Nano!) by inputting 'camera_link' and adding in 'Image'. Designate the Image 'topic' with your desired input and the realtime camera feed should appear in the bottom left screen.
 - You can add in the laser scan data by then typing 'scan' where camera_link is (the camera feed will stay). Add in the the option 'LaserScan' through the option 'published nodes'. Input its topic as /scan and a laser scan readout should appear.
-- You can now drive the robot around with realtime camera and laser output.
+- You can now drive the robot around with realtime camera imaging and laser output.
 
-#### Hello World for Individual Components
+### Hello World for Individual Components
 
-Hello World for Components: Basic control with individual components
+Outlined below is the 'Hello World' for controlling/testing individual components.
 
-##### RealSense 
+#### RealSense 
 1. Run roslaunch realsense2_camera rs_camera.launch to start the realsense node
 2. Run realsense-viewer to open the graphical display (best method for testing because user can see camera output)
 3. Run roslaunch realsense2_camera rs-camera.launch filters:=pointcloud and keep open
@@ -430,7 +454,7 @@ Hello World for Components: Basic control with individual components
 
 Debugging: designate Image Topic and Topic to the visual input that you want to generate the pointcloud from (it doesn’t automatically select those options, which may result in ‘no image found’)
 
-##### Dynamixels 
+#### Dynamixels 
 
 Once the Dynamixels are configured with Dynamixel Wizard 2.0 (explained in greater detail under 'Troubleshooting', you can control the motors through the terminal. Dynamixel Workbench allow for python and cpp, and we recommend following the manual procedures for a ROS-based platform from the Dynamixel-Workbench GitHub repository. 
 
@@ -445,7 +469,7 @@ cd  ~/dynamixel-workbench/dynamixel_workbench_toolbox/examples/build
 ./position /dev/ttyUSB0 57600 1 (will rotate pi degrees 6 times)
 ``` 
 
-##### RPLiDAR
+#### RPLiDAR
 
 The LiDAR starts spinning as soon as micro-USB is plugged into pc, and you can test the node control with roslaunch rplidar_ros view_rplidar.launch. This program generates a rviz graphical readout where pointcloud is continuously made from LiDAR data.
 
@@ -460,16 +484,19 @@ This changes the permissions of RPLiDAR rules file from 0777 to 0666, as it auto
 ### Troubleshooting
 ---------------------
 
+General:
 - Be sure to use USB3.x for the RealSense camera, otherwise you will run into limitations on depth+rgb throughput when testing in ROS. 
-[Intel's website](https://www.intelrealsense.com/wp-content/uploads/2019/03/Depth_Camera_powered_by_Ethernet_WhitePaper.pdf)  
-(Currently incomplete)
+[Intel's website](https://www.intelrealsense.com/wp-content/uploads/2019/03/Depth_Camera_powered_by_Ethernet_WhitePaper.pdf)
+- Set Jetson to low power mode to run off of USB (board comes with jumper to switch to barrel-jack input, not needed for low-power mode.
+- MaxOak auto-sleeps without enough current draw, keep RPLiDAR plugged in for initial testing and running.
+
+Dynamixels (in-depth explanation below): 
 - The Dynamixels require direct configuration from the Dynamixel Wizard 2.0 application, which can be downloaded onto any platform. For the computer to be able to communicate with each Dynamixel, we found that registering them on Wizard was the most simple. 
     - After connecting the Dynamixels to the NUC and a power source, scan for the connected motors on the Wizard. The XL430-W250 motors that we used were registered with 57600 baud rate and Protocol 2.0. 
     - Once they were registered via scanning, it was necessary to configure them to 'wheel mode' from the automatic 'joint mode'. This could be done through the control panel with 'Operating Mode', changing the mode to '1' or velocity-based. Editing the system controls is only possible when torque mode is turned off, but it should be turned on for running tests. 
     - Since the motors are mirrored, it's necessary to configure them to run in the same direction. This can also be done through Dynamixel Wizard 2.0, by checking 'Reverse-drive mode'.
-- Set Jetson to low power mode to run off of USB (board comes with jumper to switch to barrel-jack input, not needed for low-power mode.
-- Configure Dynamixels using Wizard 2.0 (torque on, register USB ports, set direction)
-- MaxOak auto-sleeps without enough current draw, keep RPLiDAR plugged in
+
+CAD (in-depth explanation below): 
 - Print Solidworks Drawings to scale using custom scale and pdf-poster generator
 - Dynamixel threaded holes are only 4mm deep, can breach inner chamber if not careful
 
