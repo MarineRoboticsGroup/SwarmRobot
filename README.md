@@ -201,6 +201,7 @@ sudo udevadm trigger
 
 Then you can specify a port with each command:
 ```bash
+cd ~/catkin_ws && catkin_make
 roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch use_cmd_vel:=true usb_port:=/dev/dynamixel
 roslaunch rplidar_ros view_rplidar.launch  serial_port:=/dev/rplidar
 ``` 
@@ -343,6 +344,7 @@ catkin_make install
 echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
+* Note that setting this sourcing can complicate having more than one catkin workspaces, but for this project, it works well. 
 
 #### Usage Instructions
 
