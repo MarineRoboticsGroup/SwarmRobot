@@ -107,7 +107,7 @@ Here are the step-by-step instructions for building a swarm robot. Starting from
 16. Configure the system's environment variables and host keys as explained in the Networking section.
 17. If you're working on an Ubuntu machine (the remote control machine, not the NUC or Nano), X11 is automatically set-up (otherwise you can download an applicable X11 server). With ssh, you can work remotely from your pc after this point. X11 will become important with testing, as explained in the Final Tests section. 
 18. ssh -Y into the NUC (the command looks something like hostname@192.1...). We're using -Y to get the graphical display of the NUC, so we can visualize its GUI and visual outputs.
-19. Add 'export ROS_IP=10.42.0.25' and 'export ROS_MASTER_URI=http://10.42.0.25:11311' to your sourcing, at 'gedit !/.bashrc'. Here, you'll put in the IP address of your current Nano (which you can find via ifconfig).  
+19. Add 'export ROS_IP=10.42.0.25' and 'export ROS_MASTER_URI=http://10.42.0.25:11311' to your sourcing, at 'gedit ~/.bashrc'. Here, you'll put in the IP address of your current Nano (which you can find via ifconfig).  
 20. Download Dynamixel Wizard 2.0 and register the Dynamixels by scanning for Protocol 2.0, Baud Rate 57600, and port USB0. 
 21. Once in, change the first Dynamixel's ID to 2, reverse direction, change Operating Mode to velocity-based (mode 1). Connect the second Dynamixel to the first (to daisy-chain their communication and power sources ) and keep its ID to 1 and change its Operating Mode as well. 
 22. Create new files as in 'Registering Dynamixel and RPLiDAR USB Ports' and copy in the respective information by following the instructions.
@@ -176,7 +176,7 @@ Setting the Nano’s IP address permanently was tricky due to the wandering rang
 
 The solution to this is to go into the nm-manager-editor settings on the Nano (through a hard connection to the monitor + keyboard/mouse) and ‘MANUALLY’ setting the IP configuration to 10.42.0.25 through netmask 255.255.255.255 (IPv4 settings).
 
-Reload your new network settings via sudo /etc/init.d/networking restart
+Reload your new network settings via sudo /etc/init.d/networking restart.
 
 ### Registering Dynamixel and RPLiDAR USB Ports
 
@@ -314,7 +314,7 @@ $ roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch use_cmd
 ### ROS Wrapper for Intel RealSense Devices
 -------------------------------------------------------
 
-The Intel RealSense is a great camera for high quality RGB and depth streams for 3D scanning and video capture. The integrated IMU sensor allows for improved navigation capabilities and motion tracking, useful for any SLAM testing. We went with the RealSense 435i for its global shuttering and larger field of view.  
+The Intel RealSense is a great camera for high-quality RGB and depth streams for 3D scanning and video capture. The integrated IMU sensor allows for improved navigation capabilities and motion tracking, useful for any SLAM testing. We went with the RealSense 435i for its global shuttering and larger field of view.  
 (Full workbench can be found at https://github.com/IntelRealSense/realsense-ros) 
 
 LibRealSense supported version: v2.29.0 (see [realsense2_camera release notes](https://github.com/IntelRealSense/realsense-ros/releases))
@@ -456,7 +456,7 @@ Once everything is configured, you can run the NUC launch file to get all of the
 To do so, ssh -Y into the NUC and call roslaunch nuc.launch
 - Once the program is running, generate a separate NUC terminal and run rviz.
 - You can visualize the RealSense data (all the way from the Nano!) by inputting 'camera_link' and adding in 'Image'. Designate the Image 'topic' with your desired input and the realtime camera feed should appear in the bottom left screen.
-- You can add in the laser scan data by then typing 'scan' where camera_link is (the camera feed will stay). Add in the the option 'LaserScan' through the option 'published nodes'. Input its topic as /scan and a laser scan readout should appear.
+- You can add in the laser scan data by then typing 'scan' where camera_link is (the camera feed will stay). Add in the option 'LaserScan' through the option 'published nodes'. Input its topic as /scan and a laser scan readout should appear.
 - You can now drive the robot around with realtime camera imaging and laser output.
 
 ### Hello World for Individual Components
@@ -496,7 +496,7 @@ Debugging:
 
 An error might occur where the RPLiDAR couldn’t bind to the specified serial port /dev/tty/USB0. This seems to be common LiDAR problem, remedied through the command:
 ```bash
-sudo chmod 666 /dev/ttyUSB0"
+sudo chmod 666 /dev/ttyUSB0
 ``` 
 This changes the permissions of RPLiDAR rules file from 0777 to 0666, as it automatically reverts to 0777 when the LiDAR starts running or is plugged in. Once the command is in, everything runs smoothly. (This is separate from long-term set-up with setting sym-links to the RPLiDAR USB port, aimed towards quick initial testing.)
 
@@ -505,7 +505,6 @@ This changes the permissions of RPLiDAR rules file from 0777 to 0666, as it auto
 
 General:
 - Be sure to use USB3.x for the RealSense camera, otherwise you will run into limitations on depth+rgb throughput when testing in ROS. 
-[Intel's website](https://www.intelrealsense.com/wp-content/uploads/2019/03/Depth_Camera_powered_by_Ethernet_WhitePaper.pdf)
 - Set Jetson to low power mode to run off of USB (board comes with jumper to switch to barrel-jack input, not needed for low-power mode.
 - MaxOak auto-sleeps without enough current draw, keep RPLiDAR plugged in for initial testing and running.
 
@@ -514,8 +513,6 @@ Dynamixels (in-depth explanation below):
     - After connecting the Dynamixels to the NUC and a power source, scan for the connected motors on the Wizard. The XL430-W250 motors that we used were registered with 57600 baud rate and Protocol 2.0. 
     - Once they were registered via scanning, it was necessary to configure them to 'wheel mode' from the automatic 'joint mode'. This could be done through the control panel with 'Operating Mode', changing the mode to '1' or velocity-based. Editing the system controls is only possible when torque mode is turned off, but it should be turned on for running tests. 
     - Since the motors are mirrored, it's necessary to configure them to run in the same direction. This can also be done through Dynamixel Wizard 2.0, by checking 'Reverse-drive mode'.
-
-CAD (in-depth explanation below): 
 - Print Solidworks Drawings to scale using custom scale and pdf-poster generator
 - Dynamixel threaded holes are only 4mm deep, can breach inner chamber if not careful
 
@@ -538,18 +535,18 @@ Debugging: MaxOak will shut down if there’s not a high enough current draw. Wh
 
 Printing a full-size drawing of a design can be helpful in the prototyping or manufacturing phase, depending on your set-up and available tools.
 
-Here are some steps for successfully creating a to-scale representation.
+Here are some steps for successfully creating a to-scale representation:
 
 1. Create the part in SolidWorks
 2. Open as Drawing (DRWG)
 3. Depending on the size of the part, make custom paper size (in multiples of 8.5”x11”) if larger than letter paper
 4. Put goal view on page and select ‘scale to page’
 5. Change page scale to be 1:1 (most printers aren’t accurate enough to print 1:1. Print out a test measurement ex. a six inch line, and modify the first ‘1’ to that value.)
-6. Our printer’s scale was closer to 1.03225:1, which I put into the custom scale properties.
+6. Our printer’s scale was closer to 1.03225:1, which I put into the custom scale properties
 7. Save drawing as pdf
 8. Open pdf in a pdf reader (make sure the app can print posters if part is larger than letter paper, I used Adobe Acrobat.)
-9. Print as poster in pdf reader, spanning across pages with 100% scaling.
-10. Cut pages at lines and assemble paper design with tape for a simple to-scale drawing.
+9. Print as poster in pdf reader, spanning across pages with 100% scaling
+10. Cut pages at lines and assemble paper design with tape for a simple to-scale drawing
 
 
 ## More information
