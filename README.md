@@ -67,6 +67,19 @@ Our design is centered around several principles, which are loosely ordered by i
 
 ### Setting up
 
+- Intel NUC7i3DNHNC Mini PC
+- MAXOAK Power Bank
+- SinKeu Power Bank
+- DWM1001 Development Board
+- Intel RealSense Depth Camera D435i
+- Jetson Nano Developer Kit
+- DFR0315 RPLIDAR A1 Development Kit
+- Dynamixel XL430-W250-T
+- TurtleBot3 Burger Wheel Set
+- Ball Caster
+- U2D2
+- Dynamixel Power Hub
+
 All listed components are the main parts of the robot, but other parts are needed for power distribution and connection. These include: one or more power banks with the required ports, custom JST connectors, barrel jack cables, USB-micro cables, USB-C cables, USB-TTL adaptors, hook and loop velcro tape, wheels, ball caster (for stability), and plates (we custom designed and laser-cut the plates). 
 
 ![image](https://user-images.githubusercontent.com/66733789/90140916-69c31d80-dd48-11ea-9a26-2d006f112616.png)
