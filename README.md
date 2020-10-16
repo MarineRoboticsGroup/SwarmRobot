@@ -507,6 +507,7 @@ General:
 - Be sure to use USB3.x for the RealSense camera, otherwise you will run into limitations on depth+rgb throughput when testing in ROS. 
 - Set Jetson to low power mode to run off of USB (board comes with jumper to switch to barrel-jack input, not needed for low-power mode.
 - MaxOak auto-sleeps without enough current draw, keep RPLiDAR plugged in for initial testing and running.
+- If NUC won't turn on try testing the power cables connecting it to the battery. Sometimes they are not fully in and result in a poor connection. Also, sometimes just try flipping the ends of the cable (switching what they are plugged into). It is unclear why this works, but it does :)
 
 Dynamixels (in-depth explanation below): 
 - The Dynamixels require direct configuration from the Dynamixel Wizard 2.0 application, which can be downloaded onto any platform. For the computer to be able to communicate with each Dynamixel, we found that registering them on Wizard was the most simple. 
