@@ -4,8 +4,8 @@
 # Make script executable (chmod +x nano_install.sh) then run ./nano_install.sh
 # Credit to JetsonHacks for their Nano-specific downloads!
 
-INSTALL_ROOT=$HOME/catkin_ws
-INSTALL_SRC=$INSTALL_ROOT/src/
+CATKIN_HOME=$HOME/catkin_ws
+CATKIN_SRC_DIR=$CATKIN_HOME/src/
 ROS_VERSION="melodic"
 
 # Check that ROS is installed
