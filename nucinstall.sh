@@ -45,6 +45,7 @@ sudo adduser $USER dialout
 sudo chmod 666 /dev/ttyUSB0
 
 sudo apt install -y python-catkin-tools
+cp -r ~/SwarmRobot $CATKIN_SRC_DIR/swarm-robot
 catkin build
 
 # Set current catkin workspace to default (means should only have one workspace on computer)
