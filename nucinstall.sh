@@ -3,6 +3,18 @@
 # Shell script to install all required packages for RPLiDAR NUC PC
 # Make script executable (chmod +x nuc_install.sh) then run ./nuc_install.sh
 
+# Set up ROS Melodic
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+sudo apt update
+sudo apt install -y ros-melodic-desktop-full
+echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+sudo apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool python3-vcstool build-essential
+sudo apt install -y python-rosdep
+sudo rosdep init
+rosdep update
+
 # Downloading all ROS packages via apt package manager
 PKG_PREFIX="ros-melodic"
 PKGS="navigation nav-msgs trajectory-msgs geometry-msgs sensor-msgs rqt-tf-tree rosserial-python std-msgs joy"
@@ -19,7 +31,7 @@ do
   fi
 done
 
-
+source ~/.bashrc
 # Setting up catkin workspace
 CATKIN_HOME=$HOME/catkin_ws
 CATKIN_SRC_DIR=$CATKIN_HOME/src/
@@ -40,6 +52,7 @@ sudo apt install -y python3-vcstool
 vcs import src < $CATKIN_SRC_DIR/dynamixel-workbench/.dynamixel_workbench.rosinstall
 vcs pull src
 
+source ~/.bashrc
 # Sourcing and building workspace
 sudo adduser $USER dialout
 sudo chmod 666 /dev/ttyUSB0
@@ -47,9 +60,9 @@ sudo chmod 666 /dev/ttyUSB0
 sudo apt install -y python-catkin-tools
 cp -r ~/SwarmRobot $CATKIN_SRC_DIR/swarm-robot
 catkin build
+source ~/.bashrc
 
 # Set current catkin workspace to default (means should only have one workspace on computer)
-echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
 echo "source $CATKIN_HOME/devel/setup.bash" >> ~/.bashrc
 echo "export ROS_IP=10.42.0.1" >> ~/.bashrc
 echo "export ROS_MASTER_URI=http://10.42.0.1:11311" >> ~/.bashrc
