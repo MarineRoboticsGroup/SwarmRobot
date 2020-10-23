@@ -52,13 +52,22 @@ sudo apt install -y python3-vcstool
 vcs import src < $CATKIN_SRC_DIR/dynamixel-workbench/.dynamixel_workbench.rosinstall
 vcs pull src
 
-source ~/.bashrc
+# Set symbolic link to U2D2 for dynamixels so can always be found
+# (https://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_workbench/)
+wget https://raw.githubusercontent.com/ROBOTIS-GIT/dynamixel-workbench/master/99-dynamixel-workbench-cdc.rules
+sudo cp ./99-dynamixel-workbench-cdc.rules /etc/udev/rules.d/
+rm ./99-dynamixel-workbench-cdc.rules
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
 # Sourcing and building workspace
 sudo adduser $USER dialout
 sudo chmod 666 /dev/ttyUSB0
 
+# build catkin workspace
 sudo apt install -y python-catkin-tools
 cp -r ~/SwarmRobot $CATKIN_SRC_DIR/swarm-robot
+source ~/.bashrc
 catkin build
 source ~/.bashrc
 
@@ -68,6 +77,13 @@ echo "export ROS_IP=10.42.0.1" >> ~/.bashrc
 echo "export ROS_MASTER_URI=http://10.42.0.1:11311" >> ~/.bashrc
 source ~/.bashrc
 
+# install terminator
+sudo add-apt-repository ppa:gnome-terminator
+sudo apt update -y
+sudo apt install -y terminator
+
+
 # Test downloads through RPLiDAR with roslaunch rplidar_ros view_rplidar.launch
 # If launch file isn't working, confirm that packages/programs are sourced and
 # in the src folder
+
