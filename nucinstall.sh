@@ -54,9 +54,7 @@ vcs pull src
 
 # Set symbolic link to U2D2 for dynamixels so can always be found
 # (https://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_workbench/)
-wget https://raw.githubusercontent.com/ROBOTIS-GIT/dynamixel-workbench/master/99-dynamixel-workbench-cdc.rules
-sudo cp ./99-dynamixel-workbench-cdc.rules /etc/udev/rules.d/
-rm ./99-dynamixel-workbench-cdc.rules
+sudo cp ~/SwarmRobot/99-dynamixel-workbench-cdc.rules /etc/udev/rules.d/
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 
