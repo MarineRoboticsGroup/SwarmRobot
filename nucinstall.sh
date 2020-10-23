@@ -55,6 +55,7 @@ vcs pull src
 # Set symbolic link to U2D2 for dynamixels so can always be found
 # (https://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_workbench/)
 sudo cp ~/SwarmRobot/99-dynamixel-workbench-cdc.rules /etc/udev/rules.d/
+sudo cp ~/SwarmRobot/88-rplidar.rules /etc/udev/rules.d/
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 
