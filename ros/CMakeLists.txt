@@ -2,15 +2,11 @@
 # Set minimum required version of cmake, project name and compile options
 ################################################################################
 cmake_minimum_required(VERSION 3.10.2)
-project(swarm_robot_wheel_operators)
-# project(dynamixel_workbench_operators)
+project(swarm_robot)
 
-# Let's try to be a bit modern.
 set(CMAKE_CXX_STANDARD 17)
 
-################################################################################
 # Find catkin packages and libraries for catkin and system dependencies
-################################################################################
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_srvs
@@ -31,25 +27,27 @@ catkin_package(
 ################################################################################
 
 
-add_executable(swarmbot_preprogrammed_wheel_operator
-  src/wheel_operator.cpp
+add_executable(swarmbot_traj_wheel_operator
+  src/traj_wheel_operator.cpp
 )
-add_dependencies(swarmbot_preprogrammed_wheel_operator
+add_dependencies(swarmbot_traj_wheel_operator
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
-target_include_directories(swarmbot_preprogrammed_wheel_operator
-  include
-  ${catkin_INCLUDE_DIRS}
+target_include_directories(swarmbot_traj_wheel_operator
+  PUBLIC
+    /include
+    ${catkin_INCLUDE_DIRS}
 )
-target_link_libraries(swarmbot_preprogrammed_wheel_operator
-  ${catkin_LIBRARIES}
+target_link_libraries(swarmbot_traj_wheel_operator
+  PUBLIC
+    ${catkin_LIBRARIES}
 )
 
 #################################################################################
 ## Install
 #################################################################################
-install(TARGETS swarmbot_preprogrammed_wheel_operator
+install(TARGETS swarmbot_traj_wheel_operator
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

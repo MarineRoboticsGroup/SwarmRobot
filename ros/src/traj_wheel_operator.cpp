@@ -1,9 +1,8 @@
 /**
- * @brief this file allows for driving the robot through repeatable motions
+ * @brief this file allows for driving the robot through predetermined trajectories
  *
  * Authors: Alan Papalia
  */
-// TODO rename file
 
 #include <tuple>
 #include <list>
@@ -27,11 +26,11 @@ MoveInfo make_left_turn(float radius, float forward_vel, float degrees)
 {
   geometry_msgs::Twist twist_msg;
   twist_msg.linear.x = forward_vel;
-  angular_vel = forward_vel / radius;
+  float angular_vel = forward_vel / radius;
   twist_msg.angular.z = angular_vel;
-  angle_radians = degrees / 180.0 * M_PI;
-  dist_traveled = 2 * M_PI * radius / angle_radians;
-  time_travel = dist_traveled / forward_vel;
+  float angle_radians = degrees / 180.0 * M_PI;
+  float dist_traveled = 2 * M_PI * radius / angle_radians;
+  float time_travel = dist_traveled / forward_vel;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
 }
@@ -48,11 +47,11 @@ MoveInfo make_right_turn(float radius, float forward_vel, float degrees)
 {
   geometry_msgs::Twist twist_msg;
   twist_msg.linear.x = forward_vel;
-  angular_vel = -forward_vel / radius;
+  float angular_vel = -forward_vel / radius;
   twist_msg.angular.z = angular_vel;
-  angle_radians = degrees / 180.0 * M_PI;
-  dist_traveled = 2 * M_PI * radius / angle_radians;
-  time_travel = dist_traveled / forward_vel;
+  float angle_radians = degrees / 180.0 * M_PI;
+  float dist_traveled = 2 * M_PI * radius / angle_radians;
+  float time_travel = dist_traveled / forward_vel;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
 }
@@ -68,7 +67,7 @@ MoveInfo make_straight_move(float dist, float forward_vel)
 {
   geometry_msgs::Twist twist_msg;
   twist_msg.linear.x = forward_vel;
-  time_travel = dist / forward_vel;
+  float time_travel = dist / forward_vel;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
 }
@@ -85,8 +84,8 @@ MoveInfo make_stationary_left_turn(float degrees, float angular_vel)
 {
   geometry_msgs::Twist twist_msg;
   twist_msg.angular.z = angular_vel;
-  angle_radians = degrees / 180.0 * M_PI;
-  time_travel = angle_radians / degrees;
+  float angle_radians = degrees / 180.0 * M_PI;
+  float time_travel = angle_radians / degrees;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
 }
@@ -102,8 +101,8 @@ MoveInfo make_stationary_right_turn(float degrees, float angular_vel)
 {
   geometry_msgs::Twist twist_msg;
   twist_msg.angular.z = angular_vel;
-  angle_radians = degrees / 180.0 * M_PI;
-  time_travel = -angle_radians / degrees;
+  float angle_radians = degrees / 180.0 * M_PI;
+  float time_travel = -angle_radians / degrees;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
 }
@@ -111,9 +110,9 @@ MoveInfo make_stationary_right_turn(float degrees, float angular_vel)
 std::list<MoveInfo> generate_rectangle_traj(float long_side_len, float short_side_len, float max_linear_vel, float max_ang_vel, int num_loops)
 {
   std::list<MoveInfo> moves;
-  for (i = 0; i < num_loops; i++)
+  for (int i = 0; i < num_loops; i++)
   {
-    for (j = 0; j < 2; j++)
+    for (int j = 0; j < 2; j++)
     {
       moves.push_back(make_straight_move(long_side_len, max_linear_vel));
       moves.push_back(make_stationary_left_turn(90.0, max_ang_vel));
@@ -127,23 +126,15 @@ std::list<MoveInfo> generate_rectangle_traj(float long_side_len, float short_sid
 // TODO finish this function
 std::list<MoveInfo> generate_spiral_traj(float outer_radius, float inner_radius, float linear_vel)
 {
-  std::exception("Not Implemented");
+  throw std::runtime_error("Not Implemented");
   std::list<MoveInfo> moves;
-  for (i = 0; i < num_loops; i++)
-  {
-    for (j = 0; j < 4; j++)
-    {
-      moves.push_back(make_straight_move(side_len, max_linear_vel));
-      moves.push_back(make_stationary_left_turn(90.0, max_ang_vel));
-    }
-  }
   return moves;
 }
 
 std::list<MoveInfo> generate_figure_8_traj(float radius, float linear_vel, int num_loops)
 {
   std::list<MoveInfo> moves;
-  for (i = 0; i < num_loops; i++)
+  for (int i = 0; i < num_loops; i++)
   {
     moves.push_back(make_left_turn(radius, linear_vel, 360));
     moves.push_back(make_right_turn(radius, linear_vel, 360));
@@ -155,34 +146,42 @@ std::list<MoveInfo> generate_figure_8_traj(float radius, float linear_vel, int n
 int main(int argc, char **argv)
 {
   // Init ROS node
-  ros::init(argc, argv, "swarmbot_preprogrammed_wheel_operator");
+  ros::init(argc, argv, "swarmbot_traj_wheel_operator");
   ros::NodeHandle node_handle("");
-  std::list<MoveInfo> move_queue;
-  MoveInfo current_move;
+  ros::Publisher cmd_vel_pub = node_handle.advertise<geometry_msgs::Twist>("cmd_vel", 10);
+  ros::Rate loop_rate(100);
+
 
   if (argc > 1)
   {
-    lin_vel_step = atof(argv[1]);
-    ang_vel_step = atof(argv[2]);
+    // lin_vel_step = atof(argv[1]);
+    // ang_vel_step = atof(argv[2]);
   }
 
-  ros::Publisher cmd_vel_pub = node_handle.advertise<geometry_msgs::Twist>("cmd_vel", 10);
-  geometry_msgs::Twist twist_msg;
+  std::list<MoveInfo> move_queue = generate_figure_8_traj(1.0, 0.1, 1);
+
+  auto move_it = move_queue.begin();
+  MoveInfo current_move = *move_it;
+  geometry_msgs::Twist twist_msg; 
   float move_duration;
+  std::tie(twist_msg, move_duration) = current_move;
 
-  ros::Rate loop_rate(100);
-
-  current_move = move_queue.pop_front();
-  auto [twist_msg, move_duration] = current_move;
   ros::Time start_move_time = ros::Time::now();
   ros::Time curr_time = ros::Time::now();
   while (ros::ok())
   {
+	if(move_it == move_queue.end()){
+	  twist_msg.linear.x = 0;
+	  twist_msg.angular.z = 0;
+	  cmd_vel_pub.publish(twist_msg);
+	break;
+	}
     curr_time = ros::Time::now();
-    if (curr_time - start_move_time > move_duration)
+    if ((curr_time - start_move_time).toSec() > move_duration)
     {
-      current_move = move_queue.pop_front();
-      auto [twist_msg, move_duration] = current_move;
+      ++move_it;
+      current_move = *move_it;
+      std::tie(twist_msg, move_duration) = current_move;
       start_move_time = ros::Time::now();
     }
     cmd_vel_pub.publish(twist_msg);

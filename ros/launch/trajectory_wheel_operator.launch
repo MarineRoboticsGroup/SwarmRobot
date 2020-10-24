@@ -1,0 +1,4 @@
+<launch>
+  <arg name="namespace" default="dynamixel_workbench"/>
+  <node name="swarmbot_traj_wheel_operator" pkg="swarm_robot" type="swarmbot_traj_wheel_operator" required="true" output="screen" ns="$(arg namespace)"/>
+</launch>

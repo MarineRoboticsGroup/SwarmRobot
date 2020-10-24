@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>swarm_robot</name>
+  <version>0.1.0</version>
+  <description>The Marine Robotics Group swarm robot ros package</description>
+  <maintainer email="apapalia@mit.edu">Alan Papalia</maintainer>
+  <license>BSD</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rosconsole</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>trajectory_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>rosconsole</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>trajectory_msgs</run_depend>
+  <run_depend>std_srvs</run_depend>
+</package>
