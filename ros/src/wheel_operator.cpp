@@ -1,6 +1,6 @@
 /**
  * @brief this file allows for driving the robot through repeatable motions
- * 
+ *
  * Authors: Alan Papalia
  */
 // TODO rename file
@@ -17,7 +17,7 @@ typedef std::tuple<geometry_msgs::Twist, float> MoveInfo;
 
 /**
  * @brief Generates the move info for a sweeping left turn
- * 
+ *
  * @param radius the radius of the turn
  * @param forward_vel the velocity of the robot during the turn
  * @param degrees the degrees around a circle this turn should last
@@ -38,7 +38,7 @@ MoveInfo make_left_turn(float radius, float forward_vel, float degrees)
 
 /**
  * @brief Generates the move info for a sweeping right turn
- * 
+ *
  * @param radius the radius of the turn
  * @param forward_vel the velocity of the robot during the turn
  * @param degrees the degrees around a circle this turn should last
@@ -59,7 +59,7 @@ MoveInfo make_right_turn(float radius, float forward_vel, float degrees)
 
 /**
  * @brief generates move information to move in straight line
- * 
+ *
  * @param dist distance to move
  * @param forward_vel the velocity to move at (negative indicates backwards movement)
  * @return MoveInfo all of the required move information
@@ -74,9 +74,9 @@ MoveInfo make_straight_move(float dist, float forward_vel)
 }
 
 /**
- * 
+ *
  * @brief generates move information for stationary left turn
- * 
+ *
  * @param degrees degrees to turn
  * @param angular_vel turning velocity
  * @return MoveInfo all of the required move information
@@ -93,7 +93,7 @@ MoveInfo make_stationary_left_turn(float degrees, float angular_vel)
 
 /**
  * @brief generates move information for stationary right turn
- * 
+ *
  * @param degrees degrees to turn
  * @param angular_vel turning velocity
  * @return MoveInfo all of the required move information
