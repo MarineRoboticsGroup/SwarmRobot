@@ -155,7 +155,7 @@ std::list<MoveInfo> generate_figure_8_traj(float radius, float linear_vel, int n
 int main(int argc, char **argv)
 {
   // Init ROS node
-  ros::init(argc, argv, "predetermined_wheel_operator");
+  ros::init(argc, argv, "swarmbot_preprogrammed_wheel_operator");
   ros::NodeHandle node_handle("");
   std::list<MoveInfo> move_queue;
   MoveInfo current_move;
