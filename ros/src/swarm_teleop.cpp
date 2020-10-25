@@ -7,9 +7,11 @@
 #include <tuple>
 #include <list>
 #include <exception>
-#include <ros/ros.h>
 #include <math.h>
+#include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
+#include <sensor_msgs/Joy.h>
+#include "swarm_teleop.h"
 
 // moves are defined by a twist and move duration (seconds)
 typedef std::tuple<geometry_msgs::Twist, float> MoveInfo;
@@ -29,7 +31,7 @@ MoveInfo make_left_turn(float radius, float forward_vel, float degrees)
   float angular_vel = forward_vel / radius;
   twist_msg.angular.z = angular_vel;
   float angle_radians = degrees / 180.0 * M_PI;
-  float dist_traveled = 2 * M_PI * radius / angle_radians;
+  float dist_traveled = 2 * radius * angle_radians;
   float time_travel = dist_traveled / forward_vel;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
@@ -50,7 +52,7 @@ MoveInfo make_right_turn(float radius, float forward_vel, float degrees)
   float angular_vel = -forward_vel / radius;
   twist_msg.angular.z = angular_vel;
   float angle_radians = degrees / 180.0 * M_PI;
-  float dist_traveled = 2 * M_PI * radius / angle_radians;
+  float dist_traveled = 2 * radius * angle_radians;
   float time_travel = dist_traveled / forward_vel;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
@@ -85,7 +87,7 @@ MoveInfo make_stationary_left_turn(float degrees, float angular_vel)
   geometry_msgs::Twist twist_msg;
   twist_msg.angular.z = angular_vel;
   float angle_radians = degrees / 180.0 * M_PI;
-  float time_travel = angle_radians / degrees;
+  float time_travel = angle_radians / angular_vel;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
 }
@@ -102,7 +104,7 @@ MoveInfo make_stationary_right_turn(float degrees, float angular_vel)
   geometry_msgs::Twist twist_msg;
   twist_msg.angular.z = angular_vel;
   float angle_radians = degrees / 180.0 * M_PI;
-  float time_travel = -angle_radians / degrees;
+  float time_travel = -angle_radians / angular_vel;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
 }
@@ -120,14 +122,6 @@ std::list<MoveInfo> generate_rectangle_traj(float long_side_len, float short_sid
       moves.push_back(make_stationary_left_turn(90.0, max_ang_vel));
     }
   }
-  return moves;
-}
-
-// TODO finish this function
-std::list<MoveInfo> generate_spiral_traj(float outer_radius, float inner_radius, float linear_vel)
-{
-  throw std::runtime_error("Not Implemented");
-  std::list<MoveInfo> moves;
   return moves;
 }
 
@@ -149,8 +143,8 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "swarmbot_traj_wheel_operator");
   ros::NodeHandle node_handle("");
   ros::Publisher cmd_vel_pub = node_handle.advertise<geometry_msgs::Twist>("cmd_vel", 10);
+  ros::Subscriber joy_sub = node_handle.subscribe<sensor_msgs::Joy>("joy", 1, &TeleopTwistJoy::Impl::joyCallback, pimpl_);
   ros::Rate loop_rate(100);
-
 
   if (argc > 1)
   {
@@ -158,11 +152,14 @@ int main(int argc, char **argv)
     // ang_vel_step = atof(argv[2]);
   }
 
-  std::list<MoveInfo> move_queue = generate_figure_8_traj(1.0, 0.1, 1);
+  std::list<MoveInfo> move_queue;
+  std::list<MoveInfo> new_moves;
+  bool add_to_moves = false;
+  move_queue = generate_figure_8_traj(1.0, 0.1, 1);
 
   auto move_it = move_queue.begin();
   MoveInfo current_move = *move_it;
-  geometry_msgs::Twist twist_msg; 
+  geometry_msgs::Twist twist_msg;
   float move_duration;
   std::tie(twist_msg, move_duration) = current_move;
 
@@ -170,19 +167,47 @@ int main(int argc, char **argv)
   ros::Time curr_time = ros::Time::now();
   while (ros::ok())
   {
-	if(move_it == move_queue.end()){
-	  twist_msg.linear.x = 0;
-	  twist_msg.angular.z = 0;
-	  cmd_vel_pub.publish(twist_msg);
-	break;
-	}
-    curr_time = ros::Time::now();
-    if ((curr_time - start_move_time).toSec() > move_duration)
+    // TODO finish the button press code
+    // figure 8 (radius 2 m each turn)
+    if (button_press == A)
     {
-      ++move_it;
-      current_move = *move_it;
-      std::tie(twist_msg, move_duration) = current_move;
-      start_move_time = ros::Time::now();
+      new_moves = generate_figure_8_traj(2.0, 0.1, 1);
+      add_to_moves = true;
+    }
+    // rectangle (3 x 1.5)
+    elif (button_press == X)
+    {
+      new_moves = generate_rectangle_traj(3.0, 1.5, 0.1, 1, 1);
+      add_to_moves = true;
+    }
+    // square (2 x 2)
+    elif (button_press == Y)
+    {
+      new_moves = generate_rectangle_traj(2.0, 2.0, 0.1, 1, 1);
+      add_to_moves = true;
+    }
+
+    if (add_to_moves)
+    {
+      move_queue.splice(move_queue.end(), new_moves);
+    }
+
+    if (move_it == move_queue.end())
+    {
+      twist_msg.linear.x = 0;
+      twist_msg.angular.z = 0;
+      cmd_vel_pub.publish(twist_msg);
+    }
+    else
+    {
+      curr_time = ros::Time::now();
+      if ((curr_time - start_move_time).toSec() > move_duration)
+      {
+        ++move_it;
+        current_move = *move_it;
+        std::tie(twist_msg, move_duration) = current_move;
+        start_move_time = ros::Time::now();
+      }
     }
     cmd_vel_pub.publish(twist_msg);
     ros::spinOnce();
