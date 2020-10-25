@@ -1,27 +1,27 @@
-#ifndef SWARM_WHEEL_OPERATOR_H
-#define SWARM_WHEEL_OPERATOR_H
+#ifndef SWARM_TELEOP_H
+#define SWARM_TELEOP_H
 
 namespace ros
 {
   class NodeHandle;
 }
 
-namespace swarm_wheel_operator
+namespace swarm_teleop
 {
 
   /**
  * Class implementing the control of the swarmbot wheels via joystick
  */
-  class SwarmWheelOperator
+  class SwarmTeleop
   {
   public:
-    SwarmWheelOperator(ros::NodeHandle *nh, ros::NodeHandle *nh_param);
+    SwarmTeleop(ros::NodeHandle *nh, ros::NodeHandle *nh_param);
 
   private:
     struct Impl;
     Impl *pimpl_;
   };
 
-} // namespace swarm_wheel_operator
+} // namespace swarm_teleop
 
-#endif // SWARM_WHEEL_OPERATOR_H
+#endif // SWARM_TELEOP_H
