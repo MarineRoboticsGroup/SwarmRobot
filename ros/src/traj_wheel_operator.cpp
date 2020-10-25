@@ -85,7 +85,7 @@ MoveInfo make_stationary_left_turn(float degrees, float angular_vel)
   geometry_msgs::Twist twist_msg;
   twist_msg.angular.z = angular_vel;
   float angle_radians = degrees / 180.0 * M_PI;
-  float time_travel = angle_radians / degrees;
+  float time_travel = angle_radians / angular_vel;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
 }
@@ -102,7 +102,7 @@ MoveInfo make_stationary_right_turn(float degrees, float angular_vel)
   geometry_msgs::Twist twist_msg;
   twist_msg.angular.z = angular_vel;
   float angle_radians = degrees / 180.0 * M_PI;
-  float time_travel = -angle_radians / degrees;
+  float time_travel = -angle_radians / angular_vel;
   MoveInfo move = std::make_tuple(twist_msg, time_travel);
   return move;
 }
@@ -158,11 +158,22 @@ int main(int argc, char **argv)
     // ang_vel_step = atof(argv[2]);
   }
 
-  std::list<MoveInfo> move_queue = generate_figure_8_traj(1.0, 0.1, 1);
+  float figure_8_rad = 1.0;
+  float forward_vel = 0.1;
+  float angular_vel = 0.1;
+  float rect_long_length = 3.0;
+  float rect_short_length = 1.5;
+  int num_trajs = 1;
+
+  std::list<MoveInfo> move_queue = generate_figure_8_traj(figure_8_rad, forward_vel, num_trajs);
+  std::list<MoveInfo> move_queue = generate_rectangle_traj(rect_long_length, rect_short_length, forward_vel, angular_vel, num_trajs);
+
+  float time_delay = 10;
+  ros::Duration(time_delay).sleep();
 
   auto move_it = move_queue.begin();
   MoveInfo current_move = *move_it;
-  geometry_msgs::Twist twist_msg; 
+  geometry_msgs::Twist twist_msg;
   float move_duration;
   std::tie(twist_msg, move_duration) = current_move;
 
