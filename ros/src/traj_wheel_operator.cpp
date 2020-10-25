@@ -165,8 +165,9 @@ int main(int argc, char **argv)
   float rect_short_length = 1.5;
   int num_trajs = 1;
 
-  std::list<MoveInfo> move_queue = generate_figure_8_traj(figure_8_rad, forward_vel, num_trajs);
-  std::list<MoveInfo> move_queue = generate_rectangle_traj(rect_long_length, rect_short_length, forward_vel, angular_vel, num_trajs);
+  std::list<MoveInfo> move_queue;
+  move_queue = generate_figure_8_traj(figure_8_rad, forward_vel, num_trajs);
+  move_queue = generate_rectangle_traj(rect_long_length, rect_short_length, forward_vel, angular_vel, num_trajs);
 
   float time_delay = 10;
   ros::Duration(time_delay).sleep();
