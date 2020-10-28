@@ -301,6 +301,7 @@ namespace swarm_teleop
 
   void SwarmTeleop::Impl::joyCallback(const sensor_msgs::Joy::ConstPtr &joy_msg)
   {
+    ROS_INFO("I AM HERE IN THE CALLBACK");
     // if move queue still has moves we are going to ignore this callback
     if (!move_queue.empty())
     {
