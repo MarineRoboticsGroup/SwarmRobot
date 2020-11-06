@@ -1,6 +1,6 @@
 <launch>
   <!-- TODO use remap so we don't have to be hacky with the default namespace -->
-  <arg name="namespace" default="dynamixel_workbench"/>
+  <!-- <arg name="namespace" default="dynamixel_workbench"/> -->
 
   <arg name="joy_config" default="ps3" />
   <arg name="joy_dev" default="/dev/input/js0" />
@@ -14,8 +14,17 @@
     <remap from="joy" to="$(arg joy_topic)" />
   </node>
 
-  <node pkg="swarm_robot" name="swarm_teleop_node" type="swarm_teleop_node" required="true" output="screen" ns="$(arg namespace)">
+  <!-- <node pkg="swarm_robot" name="swarm_teleop_node" type="swarm_teleop_node" required="true" output="screen" ns="$(arg namespace)"> -->
+  <node pkg="swarm_robot" name="swarm_teleop_node" type="swarm_teleop_node" required="true" output="screen" >
     <rosparam command="load" file="$(arg config_filepath)" />
     <remap from="joy" to="$(arg joy_topic)" />
   </node>
 </launch>
+
+
+  <!-- <arg name="joy_config" default="ps3" />
+
+  <node pkg="teleop_twist_joy" name="teleop_twist_joy" type="teleop_node">
+    <rosparam command="load" file="$(arg config_filepath)" />
+    <remap from="joy" to="$(arg joy_topic)" />
+  </node> -->

@@ -6,4 +6,6 @@ axis_angular: 0
 scale_angular: -1.0
 
 enable_button: 4  # L1 shoulder button
-enable_turbo_button: 5  # R1 shoulder button
+rect_button: 5  # R1 shoulder button
+figure_8_button: 6  # L2 trigger button
+square_button: 7 # R2 trigger button

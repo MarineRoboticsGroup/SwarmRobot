@@ -1,6 +1,6 @@
 /**
  * @file swarmbot_wheel_operator_node.cpp
- * @author Alan PApalia (alanpapalia@gmail.com)
+ * @author Alan Papalia (alanpapalia@gmail.com)
  * @brief the node which handles all teleop control of the wheels for the MRG swarmbots
  * @version 0.1
  * @date 2020-10-25

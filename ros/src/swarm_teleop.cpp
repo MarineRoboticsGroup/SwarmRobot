@@ -1,5 +1,5 @@
 /**
- * @brief this file allows for driving the robot freely via teleop along with preprogrammed trajectories which can be triggered by buttons on the controller
+ * @brief this file allows for driving the robot freely via teleop along with preprogrammed trajectories which can be triggered by buttons on the controller. The implementation follows the PIMPL paradigm. This was inspired by the ROS teleop_twist_joy package as developed by Clearpath.
  *
  * Authors: Alan Papalia
  */
@@ -128,6 +128,9 @@ namespace swarm_teleop
     }
 
     ROS_INFO_NAMED("SwarmTeleop", "Teleop enable button %i.", pimpl_->enable_button);
+    ROS_INFO_NAMED("SwarmTeleop", "Teleop rect trajectory button %i.", pimpl_->rect_button);
+    ROS_INFO_NAMED("SwarmTeleop", "Teleop figure 8 trajectory button %i.", pimpl_->figure_8_button);
+    ROS_INFO_NAMED("SwarmTeleop", "Teleop square trajectory button %i.", pimpl_->square_button);
 
     pimpl_->sent_disable_msg = false;
   }
@@ -301,17 +304,14 @@ namespace swarm_teleop
 
   void SwarmTeleop::Impl::joyCallback(const sensor_msgs::Joy::ConstPtr &joy_msg)
   {
-    ROS_INFO("I AM HERE IN THE CALLBACK");
+
     // if move queue still has moves we are going to ignore this callback
     if (!move_queue.empty())
     {
+      ROS_INFO("Ignoring callback b/c move queue not empty");
       return;
     }
 
-    // int enable_button;
-    // int rect_button;
-    // int figure_8_button;
-    // int square_button;
     if (rect_button >= 0 &&
         joy_msg->buttons.size() > rect_button &&
         joy_msg->buttons[rect_button])
