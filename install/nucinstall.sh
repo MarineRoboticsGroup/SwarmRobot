@@ -79,8 +79,8 @@ source ~/.bashrc
 
 # Set current catkin workspace to default (means should only have one workspace on computer)
 echo "source $CATKIN_HOME/devel/setup.bash" >> ~/.bashrc
-echo "export ROS_IP=10.42.0.1" >> ~/.bashrc
-echo "export ROS_MASTER_URI=http://10.42.0.1:11311" >> ~/.bashrc
+echo "export ROS_IP=<fill in with wlan IP address>" >> ~/.bashrc
+echo "export ROS_MASTER_URI=http://128.30.10.130:11311" >> ~/.bashrc
 source ~/.bashrc
 
 # so we can ssh into this machine
