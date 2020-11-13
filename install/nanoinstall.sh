@@ -23,7 +23,7 @@ fi
 git clone https://github.com/JetsonHacksNano/installLibrealsense
 cd installLibrealsense
 ./installLibrealsense.sh
-sudo apt-get install ros-melodic-realsense2-camera
+sudo apt-get install -y ros-melodic-realsense2-camera
 
 # Test downloads through RealSense with roslaunch realsense2_camera rs_camera.launch
 # If launch file isn't working, check source of launch file with rospack
