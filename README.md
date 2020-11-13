@@ -15,6 +15,8 @@ bash ./nucinstall.sh
 
 This will install all of the basic packages required, create a catkin workspace, clone all of the required repos into this workspace, build the workspace, and remove the original repo cloned into the home directory. In addition, this performs some of the necessary network configurations of the Nuc to allow for use of this robot in a multi-robot network.
 
+<!-- TODO add note about setting the robot namespace to uniquely identify it inside this launch file -->
+<!-- TODO add note about setting the robot namespace to uniquely identify it inside the dynamixel controllers launch file -->
 <!-- TODO add note about the ROS_MASTER_URI -->
 <!-- TODO add note about the ROS_IP -->
 <!-- Link to this: http://wiki.ros.org/action/fullsearch/ROS/EnvironmentVariables -->

@@ -51,7 +51,7 @@ RPLIDAR_REPO="https://github.com/robopeak/rplidar_ros.git"
 git clone $RPLIDAR_REPO
 
 # set up all ROS dynamixel repos
-DYNAMIXEL_REPO="https://github.com/ROBOTIS-GIT/dynamixel-workbench.git"
+DYNAMIXEL_REPO="https://github.com/MarineRoboticsGroup/dynamixel-workbench.git"
 git clone $DYNAMIXEL_REPO
 cd $CATKIN_HOME
 sudo apt install -y python3-vcstool
