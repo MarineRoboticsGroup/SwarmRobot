@@ -3,6 +3,12 @@
 # Shell script to install all required packages for RPLiDAR NUC PC
 # Make script executable (chmod +x nuc_install.sh) then run ./nuc_install.sh
 
+
+# Enable repositories
+sudo add-apt-repository restricted
+sudo add-apt-repository universe
+sudo add-apt-repository multiverse
+
 # Set up ROS Melodic
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
@@ -73,15 +79,17 @@ source ~/.bashrc
 
 # Set current catkin workspace to default (means should only have one workspace on computer)
 echo "source $CATKIN_HOME/devel/setup.bash" >> ~/.bashrc
-echo "export ROS_IP=10.42.0.1" >> ~/.bashrc
-echo "export ROS_MASTER_URI=http://10.42.0.1:11311" >> ~/.bashrc
+echo "export ROS_IP=<fill in with wlan IP address>" >> ~/.bashrc
+echo "export ROS_MASTER_URI=http://128.30.10.130:11311" >> ~/.bashrc
 source ~/.bashrc
+
+# so we can ssh into this machine
+sudo apt install -y openssh-server
 
 # install terminator
 sudo add-apt-repository ppa:gnome-terminator
 sudo apt update -y
 sudo apt install -y terminator
-
 
 # Test downloads through RPLiDAR with roslaunch rplidar_ros view_rplidar.launch
 # If launch file isn't working, confirm that packages/programs are sourced and

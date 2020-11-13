@@ -1,10 +1,10 @@
-################################################################################
 # Set minimum required version of cmake, project name and compile options
-################################################################################
 cmake_minimum_required(VERSION 3.10.2)
 project(swarm_robot)
 
 set(CMAKE_CXX_STANDARD 17)
+# set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 # Find catkin packages and libraries for catkin and system dependencies
 find_package(catkin REQUIRED COMPONENTS
@@ -22,32 +22,47 @@ catkin_package(
   CATKIN_DEPENDS roscpp std_srvs sensor_msgs trajectory_msgs geometry_msgs
 )
 
-################################################################################
-# Build
-################################################################################
-
-
-add_executable(swarmbot_traj_wheel_operator
-  src/traj_wheel_operator.cpp
+# Build Teleop
+set(TELEOP_INC_DIR ./include)
+set(TELEOP_SRC_DIR ./src)
+set(teleop_headers
+ ${TELEOP_INC_DIR}/swarm_teleop.h
 )
-add_dependencies(swarmbot_traj_wheel_operator
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
+set(teleop_src
+ ${TELEOP_SRC_DIR}/swarm_teleop.cpp
 )
-target_include_directories(swarmbot_traj_wheel_operator
+add_library(teleop_lib ${teleop_src})
+target_link_libraries(teleop_lib ${catkin_LIBRARIES})
+target_include_directories(teleop_lib
   PUBLIC
-    /include
+    ${TELEOP_INC_DIR}
     ${catkin_INCLUDE_DIRS}
 )
-target_link_libraries(swarmbot_traj_wheel_operator
+
+add_executable(swarm_teleop_node
+  ${TELEOP_SRC_DIR}/swarm_teleop_node.cpp
+  ${TELEOP_SRC_DIR}/swarm_teleop.cpp
+)
+
+target_include_directories(swarm_teleop_node
   PUBLIC
+    ${catkin_INCLUDE_DIRS}
+    ${TELEOP_INC_DIR}
+)
+target_link_libraries(swarm_teleop_node
     ${catkin_LIBRARIES}
+    ${teleop_lib}
+)
+
+add_dependencies(swarm_teleop_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
 )
 
 #################################################################################
 ## Install
 #################################################################################
-install(TARGETS swarmbot_traj_wheel_operator
+install(TARGETS swarm_teleop_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
