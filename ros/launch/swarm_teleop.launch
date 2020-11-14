@@ -1,6 +1,4 @@
 <launch>
-  <!-- TODO use remap so we don't have to be hacky with the default namespace -->
-
   <arg name="namespace" default="mrg1" />
   <arg name="joy_config" default="ps3" />
   <arg name="joy_dev" default="/dev/input/js0" />

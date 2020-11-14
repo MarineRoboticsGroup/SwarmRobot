@@ -6,28 +6,80 @@
 <!-- TODO finish this section -->
 This section will walk you through getting the software and networking set up for your robot to work. This assumes that your robot has been fabricated, assembled, and all components are properly connected. Much of the setup has been automated through the bash scripts provided in this repo. Start by cloning this repository into your home directory on the Intel Nuc and running the Nuc setup script.
 
+### NUC Setup
+
 ``` BASH
 cd ~
-git clone <this_repo> swarm-robot
+git clone https://github.com/MarineRoboticsGroup/SwarmRobot.git swarm-robot
 cd ~/swarm-robot/install
 bash ./nucinstall.sh
 ```
 
-This will install all of the basic packages required, create a catkin workspace, clone all of the required repos into this workspace, build the workspace, and remove the original repo cloned into the home directory. In addition, this performs some of the necessary network configurations of the Nuc to allow for use of this robot in a multi-robot network.
+This will install all of the basic packages required, create a catkin workspace, clone all of the required repositories into this workspace, build the workspace, and remove the original repo cloned into the home directory. In addition, this performs some of the necessary network configurations of the Nuc to allow for use of this robot in a multi-robot network.
 
-<!-- TODO add note about setting the robot namespace to uniquely identify it inside this launch file -->
-<!-- TODO add note about setting the robot namespace to uniquely identify it inside the dynamixel controllers launch file -->
-<!-- TODO add note about the ROS_MASTER_URI -->
-<!-- TODO add note about the ROS_IP -->
-<!-- Link to this: http://wiki.ros.org/action/fullsearch/ROS/EnvironmentVariables -->
+Then to allow for the robots to operate over a common network, change the namespace variables in the robot launch files such that each robot has a unique namespace. In general you can do this by changing the line `<arg name="namespace" default="mrg1" />` to `<arg name="namespace" default="<this robot's unique namespace name>" />`.
 
-<!-- TODO add note about disabling automatic updates -->
-<!-- Link to this: https://www.omgubuntu.co.uk/2016/02/how-to-disable-automatic-update-ubuntu -->
+As of now the launch file(s) required to change are:
 
-<!-- !Potentially useful links for networking -->
-<!-- https://github.com/ethz-asl/mav_dji_ros_interface/wiki/NVIDIA-Jetson-TX2-integration -->
-<!-- https://risc.readthedocs.io/2-networking.html -->
-<!-- https://risc.readthedocs.io/2-ros-network-wifi-ethernet.html -->
+- ~/catkin_ws/src/swarm-robot/ros/launch/swarm_teleop.launch
+- ~/catkin_ws/src/dynamixel-workbench/dynamixel_workbench_controllers/launch/dynamixel_controllers.launch
+
+In addition, you will need to modify the ROS environment variables which specify the IP address of the ROS master and the NUC you are currently using. This was partially done in the install file, but the values will need to be modified to suit your desired setup and the specific IP of the NUC you are working on. This setup guide will cover the desired IP addresses you will want to set for several possible situations.
+
+It will be valuable to know the `ifconfig` terminal command and understand which entries correspond to wireless and wired networks. Generally, if the network interface name starts with 'wl' (e.g. 'wlp0s20f3') then it is a wireless network. If the network interface name starts with 'en' (e.g. 'enp7s0f1') then it is an ethernet connection. Note that the format of the device name varies based on the operating system being used, so may not comply with the patterns shown above.
+
+First open your `.bashrc` file in any editor and navigate to the bottom of the file.
+
+``` BASH
+nano ~/.bashrc
+```
+
+You will see two lines which look like this, where the values in <> are actually temporary values you will **need to change**:
+
+``` BASH
+echo "export ROS_IP=<Current NUC IP>" >> ~/.bashrc
+echo "export ROS_MASTER_URI=http://<Master IP>:11311" >> ~/.bashrc
+```
+
+#### Running a connected network with a separate computer
+
+This is the most recommended and expected setup, where you will run the robots in a connected network. In this arrangement there will be an additional computer (either a laptop or a desktop which is connected to the same network shared by all of the NUCs) which will be the ROS master. In this scenario you will set the following:
+
+\<Current NUC IP> = the IP address of the NUC on the shared wireless network.
+\<Master IP> = the IP address of the connected laptop or desktop on the shared wireless network.
+
+#### Running a connected network without a separate computer
+
+This is like the previous scenario but without the additional computer, which one would likely use for monitoring. It is not immediately clear why someone would want to do this, but it will be listed anyways.
+
+\<Current NUC IP> = the IP address of the NUC on the shared wireless network.
+\<Master IP> = the IP address of any of the NUCs on the shared wireless network. **Note**: It is important that in this configuration that all robots must have the same \<Master IP> address.
+
+#### Running a single robot
+
+If you intend to only run this robot independently without having it connected to any other computers over a wireless network then you can set the `Current NUC IP` and `Master IP` to the same values. This could apply to a situation where you are running multiple robots but they are not connected with eachother and are running independently of one another. Such a scenario is possible in locations where it is difficult to establish a wireless network for one reason or another.
+
+In this configuration we're assuming that the NUC is not connected to a wireless network at all.
+
+\<Current NUC IP> = the IP address of the NUC on the shared ethernet network.
+\<Master IP> = the IP address of the NUC on the shared ethernet network.
+
+#### Configure the connection between NUC and Nano
+
+Next, you will want to configure the ethernet connection between the Intel NUC and the Jetson Nano. The easiest way to do this is by first making sure the Nano is powered on and connected to the NUC via ethernet. Then open your connections as such:
+
+``` BASH
+nm-connection-editor
+```
+
+Edit the wired connection between the NUC and the Nano (commonly named 'Wired Connection 1') and navigate to the IPv4 Settings Tab. Change method to `Shared to other computers` and click in the table of addresses to add a new entry. Set the entry to the following values - Address: 10.42.0.1 / Netmask: 24 / Gateway: (leave empty). This will set it such that the IP address of the NUC on the network made over this ethernet connection will always be `10.42.0.1`.
+
+This can be done for all of the NUCs on the network, and will not cause any issues. This is because this is only their IP address for the local network connection they have with their connected Nano, so this IP address will not be reachable for any of the other NUCs in the larger ROS network. The connections between all of the NUCs on the ROS network will be shared over some local wireless network, on which it will have a separate IP address from the local ethernet network it shares with the Nano.
+
+Finally, for convenience it is recommended to disable automatic updates, as described in [this line](https://www.omgubuntu.co.uk/2016/02/how-to-disable-automatic-update-ubuntu).
+
+### Nano Setup
+<!-- TODO finish this section  -->
 
 ## Background
 
