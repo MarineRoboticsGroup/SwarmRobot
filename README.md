@@ -3,10 +3,13 @@
 
 ## Quick Start
 
-<!-- TODO finish this section -->
 This section will walk you through getting the software and networking set up for your robot to work. This assumes that your robot has been fabricated, assembled, and all components are properly connected. Much of the setup has been automated through the bash scripts provided in this repo. Start by cloning this repository into your home directory on the Intel Nuc and running the Nuc setup script.
 
 ### NUC Setup
+
+This setup assumes that you have either Ubuntu 18.04 or 20.04 installed on the NUC. If not, I recommend following the official Ubuntu tutorials on [installing Ubuntu desktop from USB flash drive](https://ubuntu.com/tutorials/install-ubuntu-desktop#4-boot-from-usb-flash-drive) and [creating a bootable USB stick](https://ubuntu.com/tutorials/create-a-usb-stick-on-windows#1-overview).
+
+Once this is done, the following instructions will walk you through the necessary steps to set up the NUC.
 
 ``` BASH
 cd ~
@@ -14,6 +17,8 @@ git clone https://github.com/MarineRoboticsGroup/SwarmRobot.git swarm-robot
 cd ~/swarm-robot/install
 bash ./nucinstall.sh
 ```
+
+**The bash script may sometimes fail while building the catkin workspace.** In this case: close the terminal, open a new terminal, and rerun `bash ./nucinstall.sh`
 
 This will install all of the basic packages required, create a catkin workspace, clone all of the required repositories into this workspace, build the workspace, and remove the original repo cloned into the home directory. In addition, this performs some of the necessary network configurations of the Nuc to allow for use of this robot in a multi-robot network.
 
@@ -79,7 +84,27 @@ This can be done for all of the NUCs on the network, and will not cause any issu
 Finally, for convenience it is recommended to disable automatic updates, as described in [this line](https://www.omgubuntu.co.uk/2016/02/how-to-disable-automatic-update-ubuntu).
 
 ### Nano Setup
-<!-- TODO finish this section  -->
+
+The nano setup should be mostly uninvolved. This setup assumes that the Jetson Nano has already been setup and is bootable. If not, follow [this tutorial](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit#intro) to get started with the Nano.
+
+We will first run a setup script that installs the necessary libraries for the Nano to work with the RealSense Camera.
+
+``` BASH
+cd ~
+git clone https://github.com/MarineRoboticsGroup/SwarmRobot.git swarm-robot
+cd ~/swarm-robot/install
+bash ./nanoinstall.sh
+```
+
+From here we just need to set up the wired connection between the Nano and the NUC. Make sure that there is an ethernet connecting the two devices and then open the connections configurations with the following command.
+
+``` BASH
+nm-connection-editor
+```
+
+There should be a single connection profile that says something like 'Wired Connection 1'. Edit this connection. Navigate to the `IPv4 Settings` tab. Change `Method` to *Manual*. In the Addresses table set the first (and only) row item to `Address = 10.42.0.25 | Netmask = 24 | Gateway = 10.42.0.1`.
+
+This should be all that is necessary to set up on the Nano for our base configuration. You should check that the connection between the NUC and Nano is functioning by first trying to ping the NUC from the nano: `ping 10.42.0.1`. If this works then the Nano can find the NUC on the shared wired network between them. You can try ssh-ing into the NUC from the Nano and vice-versa to be more certain that the connections are setup properly, but as our networking is fairly simple ping-ing seems to generally be a sufficient test unless you notice further networking issues when trying to operate the robots.
 
 ## Background
 

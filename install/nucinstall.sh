@@ -46,6 +46,10 @@ if [ ! -d $CATKIN_SRC_DIR ]; then
 fi
 cd $CATKIN_SRC_DIR
 
+# clone swarm robot repo into catkin workspace
+SWARM_REPO="https://github.com/MarineRoboticsGroup/SwarmRobot.git"
+git clone $SWARM_REPO swarm-robot
+
 # clone rplidar repo into catkin workspace
 RPLIDAR_REPO="https://github.com/robopeak/rplidar_ros.git"
 git clone $RPLIDAR_REPO
