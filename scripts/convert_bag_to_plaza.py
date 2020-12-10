@@ -13,7 +13,6 @@ import re
 from scipy.spatial.transform import Rotation as R
 
 
-
 def dist_between_poses(p1, p2):
     dx = p1.x - p2.x
     dy = p1.y - p2.y
@@ -28,9 +27,13 @@ def get_vicon_start_and_end(data_dir, trial_name, trial_span, near_start=0, norm
 
     Args:
         trial_name (str): the name of the trial
-        trial_span (float): the length over which the robot is expected to be moving
-        near_start (int, optional): This is to skip false early movements. We will only look for the start of this movement after this many seconds have elapsed. Defaults to 0.
-        normalize_time (bool, optional): Whether or not to time shift so the first data begins at t=0. Defaults to True.
+        trial_span (float): the length over which the robot is expected to be
+            moving
+        near_start (int, optional): This is to skip false early movements. We
+            will only look for the start of this movement after this many seconds
+            have elapsed. Defaults to 0.
+        normalize_time (bool, optional): Whether or not to time shift so the
+            first data begins at t=0. Defaults to True.
 
     Returns:
         (float, float): the start and end times for the trial in this rosbag
@@ -252,7 +255,7 @@ def convert_results_to_plaza(data_dir, trial_name):
     # %    Time (sec)    X_pose (m)    Y_pose (m)    Heading (rad)
     # % TL: Surveyed Node Locations
     # %    Time (sec)    X_pose (m)    Y_pose (m)
-    # % TD
+    # % TD: Ranging data
     # %    Time (sec)    Sender / Antenna ID    Receiver Node ID    Range (m)
 
     Args:
@@ -410,7 +413,8 @@ def convert_results_to_plaza(data_dir, trial_name):
             # timestamp(sec) robot_id lmk_id range(m)
             time = t.to_sec()
             data = msg.uwb
-            dist = float(data.dist)
+            # convert dist measurements from mm to meters
+            dist = float(data.dist)/1000
             addr = data.addr
             anchor_id = anchor_id_map[addr]
             data_td.write('{} {} {} {}\n'.format(
@@ -436,12 +440,20 @@ def convert_results_to_plaza(data_dir, trial_name):
 
 
 if __name__ == "__main__":
-    """ Looks through directory specified and merges the _robot and _vicon rosbags into a _merged rosbag. Then converts the _merged rosbag to the same format as the Plaza dataset
+    """ Looks through directory specified and merges the _robot and _vicon
+    rosbags into a _merged rosbag. Then converts the _merged rosbag to the
+    same format as the Plaza dataset
 
-    Note: noise in Vicon position estimate has lead to inaccurate 'start' times for when the robot is moving. This is necessary to detect to properly merge the two rosbags. To fix this we specify a 'near start' time in 'near_trial_start.json' where we will only look for the trial start after the specified time.
+    Note: noise in Vicon position estimate has lead to inaccurate 'start'
+    times for when the robot is moving. This is necessary to detect to
+    properly merge the two rosbags. To fix this we specify a 'near start'
+    time in 'near_trial_start.json' where we will only look for the trial
+    start after the specified time.
+
+    To run just specify the directory in which bag files are held and make sure
+    that there are _robot and _vicon rosbags for each data collection trial.
     """
 
-    # TODO check to make sure that robot z is relatively constant
     data_dir = "/home/alan/swarmbot_vicon_data/"
     with open('near_trial_start.json') as json_file:
         begin_check_start = json.load(json_file)
