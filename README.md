@@ -13,7 +13,7 @@ Once this is done, the following instructions will walk you through the necessar
 
 ``` BASH
 cd ~
-git clone https://github.com/MarineRoboticsGroup/SwarmRobot.git swarm-robot
+git clone https://github.com/MarineRoboticsGroup/SwarmRobot.git SwarmRobot
 cd ~/swarm-robot/install
 bash ./nucinstall.sh
 ```
