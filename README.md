@@ -96,6 +96,8 @@ cd ~/swarm-robot/install
 bash ./nanoinstall.sh
 ```
 
+*If having issues try running `bash ./nanoinstall.sh` again*. Sometimes it doesn't fully install the first time.
+
 From here we just need to set up the wired connection between the Nano and the NUC. Make sure that there is an ethernet connecting the two devices and then open the connections configurations with the following command.
 
 ``` BASH
