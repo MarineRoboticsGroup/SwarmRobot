@@ -7,6 +7,8 @@ This section will walk you through getting the software and networking set up fo
 
 ### NUC Setup
 
+<details>
+
 This setup assumes that you have either Ubuntu 18.04 or 20.04 installed on the NUC. If not, I recommend following the official Ubuntu tutorials on [installing Ubuntu desktop from USB flash drive](https://ubuntu.com/tutorials/install-ubuntu-desktop#4-boot-from-usb-flash-drive) and [creating a bootable USB stick](https://ubuntu.com/tutorials/create-a-usb-stick-on-windows#1-overview).
 
 Once this is done, the following instructions will walk you through the necessary steps to set up the NUC.
@@ -46,6 +48,10 @@ echo "export ROS_IP=<Current NUC IP>" >> ~/.bashrc
 echo "export ROS_MASTER_URI=http://<Master IP>:11311" >> ~/.bashrc
 ```
 
+### IP Address options (NUC Setup)
+
+<details>
+
 #### Running a connected network with a separate computer
 
 This is the most recommended and expected setup, where you will run the robots in a connected network. In this arrangement there will be an additional computer (either a laptop or a desktop which is connected to the same network shared by all of the NUCs) which will be the ROS master. In this scenario you will set the following:
@@ -69,7 +75,9 @@ In this configuration we're assuming that the NUC is not connected to a wireless
 \<Current NUC IP> = the IP address of the NUC on the shared ethernet network.
 \<Master IP> = the IP address of the NUC on the shared ethernet network.
 
-#### Configure the connection between NUC and Nano
+</details>
+
+#### Configure the connection between NUC and Nano (NUC)
 
 Next, you will want to configure the ethernet connection between the Intel NUC and the Jetson Nano. The easiest way to do this is by first making sure the Nano is powered on and connected to the NUC via ethernet. Then open your connections as such:
 
@@ -83,7 +91,11 @@ This can be done for all of the NUCs on the network, and will not cause any issu
 
 Finally, for convenience it is recommended to disable automatic updates, as described in [this line](https://www.omgubuntu.co.uk/2016/02/how-to-disable-automatic-update-ubuntu).
 
+</details>
+
 ### Nano Setup
+
+<details>
 
 The nano setup should be mostly uninvolved. This setup assumes that the Jetson Nano has already been setup and is bootable. If not, follow [this tutorial](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit#intro) to get started with the Nano.
 
@@ -105,6 +117,8 @@ nm-connection-editor
 There should be a single connection profile that says something like 'Wired Connection 1'. Edit this connection. Navigate to the `IPv4 Settings` tab. Change `Method` to *Manual*. In the Addresses table set the first (and only) row item to `Address = 10.42.0.25 | Netmask = 24 | Gateway = 10.42.0.1`.
 
 This should be all that is necessary to set up on the Nano for our base configuration. You should check that the connection between the NUC and Nano is functioning by first trying to ping the NUC from the nano: `ping 10.42.0.1`. If this works then the Nano can find the NUC on the shared wired network between them. You can try ssh-ing into the NUC from the Nano and vice-versa to be more certain that the connections are setup properly, but as our networking is fairly simple ping-ing seems to generally be a sufficient test unless you notice further networking issues when trying to operate the robots.
+
+</details>
 
 ## Background
 
@@ -418,7 +432,8 @@ roslaunch dynamixel_workbench_operators wheel_operator.launch
 roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch use_cmd_vel:=true
 ```
 
-### ROS Wrapper for Intel RealSense Devices
+<!-- ### ROS Wrapper for Intel RealSense Devices
+TODO (alan) review this section and update
 
 The Intel RealSense is a great camera for high-quality RGB and depth streams for 3D scanning and video capture. The integrated IMU sensor allows for improved navigation capabilities and motion tracking, useful for any SLAM testing. We went with the RealSense 435i for its global shuttering and larger field of view.
 (Full workbench can be found at https://github.com/IntelRealSense/realsense-ros)
@@ -427,7 +442,7 @@ LibRealSense supported version: v2.29.0 (see [realsense2_camera release notes](h
 
 #### Installation Instructions
 
-The simplest way to install on a clean machine is to follow the instructions on the [.travis.yml](https://github.com/intel-ros/realsense/blob/development/.travis.yml) file. It basically summerize the elaborate instructions in the following 3 steps:
+The simplest way to install on a clean machine is to follow the instructions on the [.travis.yml](https://github.com/intel-ros/realsense/blob/development/.travis.yml) file. It basically summarizes the elaborate instructions in the following 3 steps:
 
 Step 1: Install the latest Intel&reg; RealSense&trade; SDK 2.0
 
@@ -472,7 +487,7 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-Note that setting this sourcing can complicate having more than one catkin workspaces, but for this project, it works well.
+Note that setting this sourcing can complicate having more than one catkin workspaces, but for this project, it works well. -->
 
 #### Usage Instructions
 
@@ -540,6 +555,7 @@ Visit following websites for more details about RPLIDAR:
 #### How to run RPLIDAR ROS package
 
 There are two ways to run RPLIDAR ROS package
+<!-- TODO talk about how the lidar can be configured -->
 
 #### 1. Run RPLIDAR node and view in rviz
 
@@ -569,14 +585,16 @@ RPLidar frame must be broadcasted according to picture shown in rplidar-frame.pn
 
 ### Final Testing
 
-Once everything is configured, you can run the NUC launch file to get all of the components moving! The Dynamixels are teleoperable with the w,a,s,d,x keys and all nodes are live (with the Jetson nodes ssh'd through the NUC ssh-key). If you're looking to go one step further and visualize the robot's camera and lidar data, this is where the X11 setup really comes in.
+<!-- TODO (alan) rewrite this section to comply with latest version -->
+
+<!-- Once everything is configured, you can run the NUC launch file to get all of the components moving! The Dynamixels are teleoperable with the w,a,s,d,x keys and all nodes are live (with the Jetson nodes ssh'd through the NUC ssh-key). If you're looking to go one step further and visualize the robot's camera and lidar data, this is where the X11 setup really comes in.
 
 To do so, ssh -Y into the NUC and call roslaunch nuc.launch
 
 - Once the program is running, generate a separate NUC terminal and run rviz.
 - You can visualize the RealSense data (all the way from the Nano!) by inputting 'camera_link' and adding in 'Image'. Designate the Image 'topic' with your desired input and the realtime camera feed should appear in the bottom left screen.
 - You can add in the laser scan data by then typing 'scan' where camera_link is (the camera feed will stay). Add in the option 'LaserScan' through the option 'published nodes'. Input its topic as /scan and a laser scan readout should appear.
-- You can now drive the robot around with realtime camera imaging and laser output.
+- You can now drive the robot around with realtime camera imaging and laser output. -->
 
 ### Hello World for Individual Components
 
@@ -599,10 +617,10 @@ Once the Dynamixels are configured with Dynamixel Wizard 2.0 (explained in great
 
 Summing up the process:
 
-- There are three gits to download (workbench, msgs, and SDK)
+- There are three repositories to download (workbench, msgs, and SDK)
 - Setup SDK and Workbench libraries with 64bit arch (skip sample code from SDK)
 - Copy rules files, check USB port
-- Finding Dynamixels is waste of time as it only registers one (don’t be alarmed by that, only one is connected)
+- Finding Dynamixels is waste of time as it only registers one (don't be alarmed by that, only one is connected)
 - Test connection with Workbench by
 
 ```bash
@@ -655,6 +673,7 @@ As mentioned above, you can register and configure the Dynamixel motors using Dy
 
 Debugging: MaxOak will shut down if there's not a high enough current draw. When lights aren't on/power button hasn't been pressed in x amount of time, that's because the two main outputs shut down with 150 and 200 mA.
 
+<!-- 
 #### Printing SolidWorks Drawings To Scale
 
 Printing a full-size drawing of a design can be helpful in the prototyping or manufacturing phase, depending on your set-up and available tools.
@@ -670,7 +689,7 @@ Here are some steps for successfully creating a to-scale representation:
 7. Save drawing as pdf
 8. Open pdf in a pdf reader (make sure the app can print posters if part is larger than letter paper, I used Adobe Acrobat.)
 9. Print as poster in pdf reader, spanning across pages with 100% scaling
-10. Cut pages at lines and assemble paper design with tape for a simple to-scale drawing
+10. Cut pages at lines and assemble paper design with tape for a simple to-scale drawing -->
 
 ## More information
 
@@ -679,6 +698,7 @@ Documentation is available on the MRG Drive with full instructions and explanati
 ## Authors
 
 - **Sophia Franklin**
+- **Alan Papalia**
 
 ## Credits
 
@@ -690,3 +710,9 @@ Documentation is available on the MRG Drive with full instructions and explanati
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+
+
+
+
+
