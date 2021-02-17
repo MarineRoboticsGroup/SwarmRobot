@@ -1,4 +1,7 @@
 
+
+
+
 # Swarm Robot
 
 ## Quick Start
@@ -122,7 +125,38 @@ This should be all that is necessary to set up on the Nano for our base configur
 
 </details>
 
+### Quickstart Testing
+
+This section will walk you through tests to check that the individual robot is
+fully functional (at the component level).
+
+#### Dynamixel and Joystick Testing (NUC)
+
+This will require 2 separate terminals to run 2 different launch files. In
+addition, make sure that a joystick (we use Logitech Wireless Gamepad F710) is plugged into the NUC.
+
+##### terminal 1
+
+``` BASH
+roslaunch swarm_robot swarm_teleop.launch
+```
+
+##### terminal 2
+
+``` BASH
+roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch
+```
+
+After running these two things and making sure the joystick controller USB is in
+the NUC you should be able to control the robot's wheels by holding down the
+left bumper (labeled LB) and moving the left joystick around. The other buttons
+are currently mapped to different trajectories and should be avoided for now.
+
 ## Background
+
+<details>
+
+<summary> Please ignore this section until it has been cleaned up and corrected to accommodate the current codebase</summary>
 
 Testing and implementing developed SLAM algorithms is difficult due to the accessibility of fully-formed robotic swarms, and the available swarms are often expensive or ineffective. The goal of our project is to design and build a robot that can communicate via ultra wideband and scale up to a larger swarm, with the capability of assessing SLAM algorithms and swarm experimentation.
 
@@ -696,6 +730,8 @@ Here are some steps for successfully creating a to-scale representation:
 ## More information
 
 Documentation is available on the MRG Drive with full instructions and explanations. If you have any questions that aren't answered from the GitHub or Google Drive, please feel free to reach out to Sophia Franklin on slack or at sophia.franklin@gmail.com.
+
+<details>
 
 ## Authors
 
