@@ -76,7 +76,6 @@ sudo chmod 666 /dev/ttyUSB0
 
 # build catkin workspace
 sudo apt install -y python-catkin-tools
-cp -r ~/SwarmRobot $CATKIN_SRC_DIR/swarm-robot
 source ~/.bashrc
 catkin build
 source ~/.bashrc
