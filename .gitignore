@@ -32,12 +32,6 @@ ehthumbs.db
 *.lot
 main.pdf
 
-# virtual environment
-#############
-venv/
-venv/*
-
-
 # Profiling
 #############
 profiling/*
@@ -48,6 +42,7 @@ profiling/*
 .vscode/
 .history/*
 .vscode/*
+.markdownlint.json
 
 # spacemacs #
 #############
