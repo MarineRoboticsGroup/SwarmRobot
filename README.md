@@ -1,7 +1,5 @@
 
 
-
-
 # Swarm Robot
 
 ## Quick Start
@@ -132,6 +130,8 @@ fully functional (at the component level).
 
 #### Dynamixel and Joystick Testing (NUC)
 
+<details>
+
 This will require 2 separate terminals to run 2 different launch files. In
 addition, make sure that a joystick (we use Logitech Wireless Gamepad F710) is plugged into the NUC.
 
@@ -151,6 +151,89 @@ After running these two things and making sure the joystick controller USB is in
 the NUC you should be able to control the robot's wheels by holding down the
 left bumper (labeled LB) and moving the left joystick around. The other buttons
 are currently mapped to different trajectories and should be avoided for now.
+
+</details>
+
+#### UWB Testing (NUC)
+
+Make sure that the UWB is properly connected to the NUC. This means the
+light-blueish USB is plugged in and the female jumper connectors on the other end
+of this cable are attached to the UWB.
+
+From here, if the `uwb_slam` repo has been cloned into `catkin_ws/src` and
+properly built you should be able to test the connection to the UWB by running
+`roslaunch uwb_slam_ros uwb_node.launch`. The output should look something like
+the following:
+
+``` BASH
+.....................
+.....................
+hal:     UART: Rx 2 bytes: 0x3200
+lmh:     UART: Received all 2 bytes, within 19.89 ms     OK
+ [GetStatus]: Location data is ready = 1
+ [GetStatus]: Node connected to UWB = 1
+ [GetStatus]: UWB scan ready ready = 1
+ [GetStatus]: User data received = 1
+ [GetStatus]: User data ovr UWB sent = 0
+ [GetStatus]: Firmware updating? = 0
+hal:     UART: Tx 2 bytes: 0x0c00
+lmh: rx started, timeout period changed to 18 ms
+hal:     UART: Rx 2 bytes: 0x0c00
+lmh:     UART: Received all 2 bytes, within 19.70 ms     OK
+.....................
+.....................
+```
+
+issues would be indicated by output that looks like the following:
+
+``` BASH
+.....................
+.....................
+lmh:     LMH_UARTRX_Init()...
+hal:     UART: Init start.
+hal: *** ERROR *** UART: Unable to open UART. 
+hal: *** ERROR *** UART: Ensure it is not in use by another application
+hal: *** ERROR *** UART: not initialized. 
+lmh: *** ERROR *** UART: Received 0 bytes, expected 7 bytes, timed out in 1000 ms
+lmh:     UART: Received length=0
+ [GetStatus]: Unknown command or broken TLV.
+ [GetStatus]: Location data is ready = 0
+ [GetStatus]: Node connected to UWB = 176
+ [GetStatus]: UWB scan ready ready = 252
+ [GetStatus]: User data received = 127
+ [GetStatus]: User data ovr UWB sent = 0
+ [GetStatus]: Firmware updating? = 0
+hal: *** ERROR *** UART: not initialized. 
+lmh: UART: Received 0 bytes, until timed out in 1000 ms          OK
+ [GetDistances]: Unknown command or broken TLV.
+hal: *** ERROR *** UART: not initialized. 
+^C[uwb_node-2] killing on exit
+lmh: *** ERROR *** UART: Received 0 bytes, expected 7 bytes, timed out in 1000 ms
+lmh:     UART: Received length=0
+ [GetStatus]: Unknown command or broken TLV.
+ [GetStatus]: Location data is ready = 0
+ [GetStatus]: Node connected to UWB = 176
+ [GetStatus]: UWB scan ready ready = 252
+ [GetStatus]: User data received = 127
+ [GetStatus]: User data ovr UWB sent = 0
+ [GetStatus]: Firmware updating? = 0
+hal: *** ERROR *** UART: not initialized. 
+.....................
+.....................
+```
+
+**Important, Read if Errors!**: the UWB as of now needs to be recognized as `/dev/ttyUSB0` to
+function properly according to the uwb_slam repository that is used to interface
+with it. This can be first checked by running a bash script inside this
+repository `bash <swarm-robot-repo>/scripts/find_dev_port.bash`. The device in
+question will be recognized as
+'Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001'. However, this can cause
+errors as the same USB to serial connector is used on the LiDAR we use. For this
+reason, the LiDAR should be disconnected for now until the error has been fixed.
+Both of these problems are current issues in this and the `uwb_slam` repos, and
+should be fixed in the near future. Sometimes as a quick fix to the problem of
+using the correct USB port we can use `sudo setserial -g /dev/ttyUSB0` but this
+is not a perfect solution and only works when the LiDAR is not connected.
 
 ## Background
 
@@ -748,6 +831,10 @@ Documentation is available on the MRG Drive with full instructions and explanati
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+
+
+
 
 
 
