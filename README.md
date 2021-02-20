@@ -1,5 +1,8 @@
 
 
+
+
+
 # Swarm Robot
 
 ## Quick Start
@@ -657,7 +660,7 @@ After running the above command with D435i attached, the following list of topic
 
 ### RPLiDAR ROS Node and Test Application
 
-The RPLiDAR A1M8 from Roboshop is a great, inexpensive LiDAR with 360 degree FOV and a large ranging distance that integrates with SLAMAlg. It is also used on the TurtleBot3 Burger. Full workbench can be found at https://github.com/robopeak/rplidar_ros)
+The RPLiDAR A1M8 from Roboshop is a great, inexpensive LiDAR with 360 degree FOV and a large ranging distance that integrates with SLAMAlg. It is also used on the TurtleBot3 Burger. Full workbench can be found at [rplidar-ros](https://github.com/robopeak/rplidar_ros)
 
 Visit following websites for more details about RPLIDAR:
 
@@ -824,20 +827,11 @@ Documentation is available on the MRG Drive with full instructions and explanati
 ## Credits
 
 - **ROBOTIS-GIT/dynamixel-workbench**
-- **kintzhao and the rest of the contributors for https://github.com/robopeak/rplidar_ros**
-- **Intel and the contributors at https://github.com/IntelRealSense/realsense-ros**
+- **kintzhao and the rest of the contributors for [rplidar-ros](https://github.com/robopeak/rplidar_ros)**
+- **Intel and the contributors at [realsense-ros](https://github.com/IntelRealSense/realsense-ros)**
 - **JetsonHacks at jetsonhacks.com**
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-
-
-
-
-
-
-
-
-
+This project is licensed under the MIT License - see the
+[LICENSE.md](LICENSE.md) file for details
