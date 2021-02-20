@@ -1,0 +1,7 @@
+# This is a temporary file until we have set up a more permanent system for
+# working around the collision between the rplidar and UWB connector (see issues
+# in uwb-slam and this repo)
+
+# set the udev rule , make the device_port be fixed by rplidar
+# ref: https://askubuntu.com/questions/1039814/how-to-create-a-udev-rule-for-two-devices-with-the-same-manufacturer-id-product
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE:="0777", SYMLINK+="uwb"
