@@ -36,7 +36,6 @@ As of now the launch file(s) required to change are:
 - ~/catkin_ws/src/dynamixel-workbench/dynamixel_workbench_controllers/launch/dynamixel_controllers.launch (Line 4)
 - ~/catkin_ws/src/orb_slam_2_ros/ros/launch/orb_slam2_d435_rgbd.launch (Lines 3, 5, 6)
 - ~/catkin_ws/src/swarmbot_controller/launch/position_controller.launch (Line 2)
-- ~/catkin_ws/src/swarmbot_controller/src/position_controller_node.cpp (Line 22)
 
 In addition, you will need to modify the ROS environment variables which specify the IP address of the ROS master and the NUC you are currently using. This was partially done in the install file, but the values will need to be modified to suit your desired setup and the specific IP of the NUC you are working on. This setup guide will cover the desired IP addresses you will want to set for several possible situations.
 
