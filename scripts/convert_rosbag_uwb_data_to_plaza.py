@@ -1,12 +1,21 @@
 from os import times
 import rosbag
 import rospy
-import re
 
 eps = 1e-3
 
 
-def measurement_is_valid(topic, msg):
+def measurement_is_valid_uwb(topic, msg):
+    """Checks to see that is a valid UWB measurement based on topic name and
+    distance measurement
+
+    Args:
+        topic ([type]): [description]
+        msg ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     data = msg.uwb
     dist = float(data.dist)/1000
 
@@ -62,15 +71,26 @@ def get_robot_id_from_uwb_addr(addr, name_id_map, uwb_addr_map):
 
 def debug_uwb_measurements(uwb_bag_path, robots_with_tags, robot_id_map,
                            uwb_addr_name_map):
+    """Sanity check all of the UWB measurements by makeing sure that all UWBs
+    saw measurements and printing out the number of measurements that each
+    UWB recorded
+
+    Args:
+        uwb_bag_path ([type]): [description]
+        robots_with_tags ([type]): [description]
+        robot_id_map ([type]): [description]
+        uwb_addr_name_map ([type]): [description]
+    """
     uwb_rosbag = rosbag.Bag(uwb_bag_path)
 
+    # variables to track stats on UWB measurements
     tag_robots_seen = set()
     uwb_measurements = {addr: 0 for addr in uwb_addr_name_map.keys()}
-    # distances_measured = [[] for _ in range(len(uwb_addr_name_map))]
     distances_measured = []
 
+    # iterate over all measurements but only focus on the UWB measurements
     for topic, msg, timestamp in uwb_rosbag.read_messages():
-        if measurement_is_valid(topic):
+        if measurement_is_valid_uwb(topic, msg):
             data = msg.uwb
             addr = data.addr
             dist = float(data.dist)/1000
@@ -103,6 +123,17 @@ def debug_uwb_measurements(uwb_bag_path, robots_with_tags, robot_id_map,
 
 
 def convert_to_measurement(topic, msg, timestamp, name_id_map, uwb_addr_map):
+    """takes in all message information and returns a tuple specifying the
+    actual measurement info in form:
+        (timestamp, robot_id, anchor_robot_id, dist)
+
+    Args:
+        topic ([type]): message topic
+        msg ([type]): message data
+        timestamp ([type]): message timestamp
+        name_id_map (dict): mapping between robot name and robot id
+        uwb_addr_map (dict): mapping between UWB measurement and robot name
+    """
     robot_name = get_uwb_topic_namespace(topic)
     robot_id = get_robot_id_from_robot_name(robot_name, name_id_map)
     data = msg.uwb
@@ -122,6 +153,8 @@ def get_range_measurements(rosbag_path, name_id_map, uwb_addr_map):
 
     Args:
         rosbag_path (str): the path to the rosbag
+        name_id_map (dict): mapping between robot name and robot id
+        uwb_addr_map (dict): mapping between UWB measurement and robot name
 
     Returns:
         List[Tuple]: list of range measurements, format (timestamp, robot_id1,
@@ -133,12 +166,11 @@ def get_range_measurements(rosbag_path, name_id_map, uwb_addr_map):
 
     # make sure that there are uwb measurements in bag
     assert rosbag_has_uwb_msg(uwb_rosbag), "No UWB messages found in rosbag"
-    recorded_uwb_addr = set()
 
     # build list of measurements
     range_measurements = []
     for topic, msg, timestamp in uwb_rosbag.read_messages():
-        if measurement_is_valid(topic):
+        if measurement_is_valid_uwb(topic, msg):
             # get measurement tuple and add to list
             measurement = convert_to_measurement(
                 topic, msg, timestamp, name_id_map, uwb_addr_map)
@@ -148,6 +180,16 @@ def get_range_measurements(rosbag_path, name_id_map, uwb_addr_map):
 
 
 def write_range_measurements_to_file(range_measurements, output_file_path, output_format):
+    """writes all range measurements passed in to an output file
+
+    Args:
+        range_measurements (List): list of range measurement tuples
+        output_file_path (str): output file path
+        output_format (str): specifying what format to save the file to
+
+    Raises:
+        NotImplementedError: tried to save to file path not supported
+    """
     if output_format.lower() == "plaza":
         # execute
         print("Writing range measurements in plaza dataset format to " + output_file_path)
@@ -208,8 +250,10 @@ if __name__ == "__main__":
     range_measurements = get_range_measurements(
         uwb_bag_path, robot_id_map, uwb_addr_name_map)
 
+    # write all recorded measurement to file
     write_range_measurements_to_file(
         range_measurements, output_file_path, output_format)
 
+    # sanity check all measurements
     debug_uwb_measurements(uwb_bag_path, robots_with_tags,
                            robot_id_map, uwb_addr_name_map)
