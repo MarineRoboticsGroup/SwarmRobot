@@ -106,6 +106,18 @@ def get_vicon_start_and_end(data_dir, trial_name, trial_span, near_start=0, norm
 
 
 def get_robot_start_and_end(data_dir, trial_name, normalize_time=True):
+    """Tries to find the beginning and end of when the robot was moving. This is
+    used to try to align two different rosbags that are not necessarily
+    time-synchronized.
+
+    Args:
+        data_dir ([type]): [description]
+        trial_name ([type]): [description]
+        normalize_time (bool, optional): [description]. Defaults to True.
+
+    Returns:
+        [type]: [description]
+    """
     robot_bag = join(data_dir, trial_name+"_robot.bag")
     bag = rosbag.Bag(robot_bag)
     x_vel = []
@@ -148,6 +160,17 @@ def get_robot_start_and_end(data_dir, trial_name, normalize_time=True):
 
 
 def merge_rosbags(data_dir, trial_name, robot_start, vicon_start, trial_span):
+    """Merges two different rosbags, where one is vicon data and the other is a
+    rosbag recorded directly from the robot. This attempts to synchronize the
+    two bags to agree.
+
+    Args:
+        data_dir ([type]): [description]
+        trial_name ([type]): [description]
+        robot_start ([type]): [description]
+        vicon_start ([type]): [description]
+        trial_span ([type]): [description]
+    """
     results_dir = join(data_dir, trial_name)
     merged_bag_path = join(results_dir, trial_name+"_merged.bag")
     merged_bag = rosbag.Bag(merged_bag_path, mode='w')
@@ -173,7 +196,10 @@ def merge_rosbags(data_dir, trial_name, robot_start, vicon_start, trial_span):
 
 
 def get_trial_names(dir_path):
-    """Gets all of the different trial names inside the given directory. The directory this should be used on is the root directory of all of the collected data. This assumes that every intended "trial" file is of one of the following formats:
+    """Gets all of the different trial names inside the given directory. The
+    directory this should be used on is the root directory of all of the
+    collected data. This assumes that every intended "trial" file is of one
+    of the following formats:
 
     <trial_name>_robot.bag
     <trial_name>_vicon.bag
@@ -191,7 +217,7 @@ def get_trial_names(dir_path):
         end_index = max(lower_name.find("_robot.bag"), lower_name.find(
             "_vicon.bag"), lower_name.find("_merged.bag"))
         if end_index < 0:
-            return None
+            assert False, "the filename passed in was not in the specified naming format"
         trial_name = lower_name[:end_index]
         return trial_name
 
@@ -208,6 +234,16 @@ def merged_bag_exists(data_dir, trial_name):
 
 
 def results_are_converted(data_dir, trial_name):
+    """checks to see if the desired conversion files have all already been
+    generated
+
+    Args:
+        data_dir ([type]): [description]
+        trial_name ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     results_dir = join(data_dir, trial_name)
     file_extensions = ["_GT.txt", "_DR.txt", "_DRp.txt", "_TD.txt", "_TL.txt"]
     file_base = join(results_dir, trial_name)
