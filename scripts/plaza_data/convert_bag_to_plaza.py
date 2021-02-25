@@ -5,13 +5,15 @@ from os import listdir, mkdir
 from os.path import isfile, isdir, join
 import matplotlib.pyplot as plt
 import math
-import Queue
 from numpy import median
 import numpy as np
 import json
 import re
 from scipy.spatial.transform import Rotation as R
-
+try:
+    import queue
+except ImportError:
+    import Queue as queue
 
 def dist_between_poses(p1, p2):
     dx = p1.x - p2.x
@@ -357,16 +359,20 @@ def convert_results_to_plaza(data_dir, trial_name):
             id_map[addr] = i
         return id_map
 
+    # merge save / read input bag
     results_dir = join(data_dir, trial_name)
 
     merged_bag_path = join(results_dir, trial_name+"_merged.bag")
     merged_bag = rosbag.Bag(merged_bag_path)
+
+    # make sure needed topics exist
     topic_info = merged_bag.get_type_and_topic_info()[1]
     topics = topic_info.keys()
     assert "/uwb_msg" in topics, "No UWB messages found in rosbag"
     assert "/dynamixel_workbench/dynamixel_state" in topics, "No dynamixel data found in rosbag"
     assert "/vicon/mrg_robot_tag/mrg_robot_tag" in topics, "No vicon groundtruth robot location data found in rosbag"
 
+    # separate ground truth, dead reckoning, and range measurments
     gt_path = join(results_dir, trial_name+"_GT.txt")
     dr_path = join(results_dir, trial_name+"_DR.txt")
     td_path = join(results_dir, trial_name+"_TD.txt")
@@ -380,6 +386,7 @@ def convert_results_to_plaza(data_dir, trial_name):
     data_td = open(td_path, 'w')
     data_td.write("timestamp(sec) robot_id lmk_id range(m)\n")
 
+    # gt landmarks
     anchor_id_map = get_anchor_addrs_map(merged_bag)
     anchor_ids = anchor_id_map.keys()
     anchor_x_vicon_locs = [[] for anchor_id in anchor_ids]
@@ -490,7 +497,7 @@ if __name__ == "__main__":
     that there are _robot and _vicon rosbags for each data collection trial.
     """
 
-    data_dir = "/home/alan/swarmbot_vicon_data/"
+    data_dir = "/home/thumman/Desktop/swarmbot-related/test_rosbags"
     with open('near_trial_start.json') as json_file:
         begin_check_start = json.load(json_file)
 
