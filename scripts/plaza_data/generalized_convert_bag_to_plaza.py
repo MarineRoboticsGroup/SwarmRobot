@@ -26,7 +26,7 @@ def get_trial_names(dir_path):
     def get_trial_from_filename(filename):
         end_index = filename.find(".bag")
         if end_index < 0:
-            assert False, "the filename passed in was not in the specified naming format"
+            assert False, filename+" is not the specified format (.bag)"
         trial_name = filename[:end_index]
         return trial_name
 
@@ -79,7 +79,7 @@ def odometry_from_wheel_velocity(right_vel, left_vel, delta_t):
     return d_x, d_theta
 
 
-def convert_results_to_plaza(data_dir, trial_name):
+def convert_results_to_plaza(data_dir, trial_name, robot_names):
     """Converts from rosbag to same format as the plaza dataset
 
     # % GT: Groundtruth path from GPS
@@ -133,85 +133,85 @@ def convert_results_to_plaza(data_dir, trial_name):
     topic_info = merged_bag.get_type_and_topic_info()[1]
     topics = topic_info.keys()
 
-    robot_names = ["archimedes", "mrg1", "pythagoras", "grace", "mrg2"] #susan not included in the current experiment
     for name in robot_names:
         dynamixel_topic = "/"+name+"/dynamixel_state"
         vicon_topic = "/vicon/mrg_"+name+"/mrg_"+name
         assert dynamixel_topic in topics, "No dynamixel data found in rosbag"
         assert vicon_topic in topics, "No vicon groundtruth robot location data found in rosbag"
 
-    # separate ground truth, dead reckoning, and range measurments
-    gt_path = join(results_dir, trial_name+"_GT.txt")
-    dr_path = join(results_dir, trial_name+"_DR.txt")
+    for robot in robot_names:
+        # separate ground truth, dead reckoning, and range measurments
+        gt_path = join(results_dir, trial_name+"_"+robot+"_GT.txt")
+        dr_path = join(results_dir, trial_name+"_"+robot+"_DR.txt")
 
-    data_gt = open(gt_path, 'w')
-    data_gt.write("timestamp(sec) x(m) y(m) theta(rad)\n")
+        data_gt = open(gt_path, 'w')
+        data_gt.write("timestamp(sec) x(m) y(m) theta(rad)\n")
 
-    data_dr = open(dr_path, 'w')
-    data_dr.write("timestamp(sec) d_x(m) d_theta(rad)\n")
+        data_dr = open(dr_path, 'w')
+        data_dr.write("timestamp(sec) d_x(m) d_theta(rad)\n")
 
-    # previous timestamp
-    odom_last_time = None
-    # robot starting vals
-    x_start_vicon = None
-    y_start_vicon = None
-    heading_start_vicon = None
+        # previous timestamp
+        odom_last_time = None
+        # robot starting vals
+        x_start_vicon = None
+        y_start_vicon = None
+        heading_start_vicon = None
 
-    time_start = None
-    for topic, msg, t in merged_bag.read_messages():
-        if time_start is None:
-            time_start = t.to_sec()
+        time_start = None
+        for topic, msg, t in merged_bag.read_messages():
+            if time_start is None:
+                time_start = t.to_sec()
 
-        if "/vicon/mrg_" in topic:
-            # write to GT (groundtruth robot location)
-            # time, x(m), y(m), theta(rad)
-            time = t.to_sec()
-            robot_x = msg.transform.translation.x
-            robot_y = msg.transform.translation.y
+            if "/vicon/mrg_"+robot in topic:
+                # write to GT (groundtruth robot location)
+                # time, x(m), y(m), theta(rad)
+                time = t.to_sec()
+                robot_x = msg.transform.translation.x
+                robot_y = msg.transform.translation.y
 
-            # to make things simple we transform from quaternion into a rotation
-            # vector to get the heading
-            rotation = msg.transform.rotation
-            a = rotation.x
-            b = rotation.y
-            c = rotation.z
-            d = rotation.w
-            r = R.from_quat([a, b, c, d])
-            robot_heading = r.as_rotvec()[2]
-            # print('{} {}'.format("Heading: ", robot_heading))
-            if x_start_vicon is None:
-                x_start_vicon = robot_x
-                y_start_vicon = robot_y
-                heading_start_vicon = robot_heading
+                # to make things simple we transform from quaternion into a rotation
+                # vector to get the heading
+                rotation = msg.transform.rotation
+                a = rotation.x
+                b = rotation.y
+                c = rotation.z
+                d = rotation.w
+                r = R.from_quat([a, b, c, d])
+                robot_heading = r.as_rotvec()[2]
+                # print('{} {}'.format("Heading: ", robot_heading))
+                if x_start_vicon is None:
+                    x_start_vicon = robot_x
+                    y_start_vicon = robot_y
+                    heading_start_vicon = robot_heading
 
-            data_gt.write('{} {} {} {}\n'.format(
-                time, robot_x, robot_y, robot_heading))
+                data_gt.write('{} {} {} {}\n'.format(
+                    time, robot_x, robot_y, robot_heading))
 
-        elif "dynamixel_state" in topic:
-            # write to DR (deadreckoned moves)
-            # time, d_x(m), d_theta(rad)
+            elif robot+"/dynamixel_state" in topic:
+                # write to DR (deadreckoned moves)
+                # time, d_x(m), d_theta(rad)
 
-            time = t.to_sec()
-            right_vel = msg.dynamixel_state[0].present_velocity
-            left_vel = msg.dynamixel_state[1].present_velocity
+                time = t.to_sec()
+                right_vel = msg.dynamixel_state[0].present_velocity
+                left_vel = msg.dynamixel_state[1].present_velocity
 
-            if odom_last_time:
-                delta_t = time - odom_last_time
-                d_x, d_theta = odometry_from_wheel_velocity(
-                    right_vel, left_vel, delta_t)
+                if odom_last_time:
+                    delta_t = time - odom_last_time
+                    d_x, d_theta = odometry_from_wheel_velocity(
+                        right_vel, left_vel, delta_t)
 
-                # reject large noise data
-                if abs(d_x) < 0.5 and abs(d_theta) < 0.5:
-                    data_dr.write('{} {} {}\n'.format(time, d_x, d_theta))
+                    # reject large noise data
+                    if abs(d_x) < 0.5 and abs(d_theta) < 0.5:
+                        data_dr.write('{} {} {}\n'.format(time, d_x, d_theta))
 
-            odom_last_time = time
+                odom_last_time = time
 
-    data_gt.close()
-    data_dr.close()
+        data_gt.close()
+        data_dr.close()
 
-    start_pose_vicon = (x_start_vicon, y_start_vicon, heading_start_vicon)
-    drp_path = join(results_dir, trial_name+"_DRp.txt")
-    write_drp_from_dr(dr_path, drp_path, start_pose_vicon, time_start)
+        start_pose_vicon = (x_start_vicon, y_start_vicon, heading_start_vicon)
+        drp_path = join(results_dir, trial_name+"_"+robot+"_DRp.txt")
+        write_drp_from_dr(dr_path, drp_path, start_pose_vicon, time_start)
 
 
 if __name__ == "__main__":
@@ -226,6 +226,8 @@ if __name__ == "__main__":
 
     data_dir = "/home/thumman/Desktop/swarmbot-related/initial_experiment_rosbags"
 
+    robot_names = ["archimedes", "mrg1", "pythagoras", "grace", "mrg2"] #susan not included in the current experiment
+
     trials = get_trial_names(data_dir)
     for trial_name in trials:
 
@@ -234,4 +236,4 @@ if __name__ == "__main__":
             mkdir(results_dir)
 
         if not results_are_converted(data_dir, trial_name):
-            convert_results_to_plaza(data_dir, trial_name)
+            convert_results_to_plaza(data_dir, trial_name, robot_names)

@@ -220,9 +220,9 @@ if __name__ == "__main__":
     """
 
     # dataset information
-    uwb_bag_path = "/home/alan/uwb_msg_test.bag"
+    uwb_bag_path = "/home/thumman/Desktop/swarmbot-related/initial_experiment_rosbags/uwb_msg_test.bag"
     output_format = "plaza"
-    output_file_path = "/home/alan/output.txt"
+    output_file_path = "/home/thumman/Desktop/swarmbot-related/initial_experiment_rosbags/output.txt"
 
     # uwb configuration information
     robot_id_map = {"mrg1": 1,
