@@ -6,8 +6,6 @@ from os.path import isfile, isdir, join
 import matplotlib.pyplot as plt
 import math
 import numpy as np
-import json
-import re
 from scipy.spatial.transform import Rotation as R
 
 
@@ -79,7 +77,7 @@ def odometry_from_wheel_velocity(right_vel, left_vel, delta_t):
     return d_x, d_theta
 
 
-def convert_results_to_plaza(data_dir, trial_name, robot_names):
+def convert_results_to_plaza(data_dir, trial_name, robot_id_map):
     """Converts from rosbag to same format as the plaza dataset
 
     # % GT: Groundtruth path from GPS
@@ -133,16 +131,16 @@ def convert_results_to_plaza(data_dir, trial_name, robot_names):
     topic_info = merged_bag.get_type_and_topic_info()[1]
     topics = topic_info.keys()
 
-    for name in robot_names:
-        dynamixel_topic = "/"+name+"/dynamixel_state"
-        vicon_topic = "/vicon/mrg_"+name+"/mrg_"+name
+    for robot in robot_id_map.keys():
+        dynamixel_topic = "/"+robot+"/dynamixel_state"
+        vicon_topic = "/vicon/mrg_"+robot+"/mrg_"+robot
         assert dynamixel_topic in topics, "No dynamixel data found in rosbag"
         assert vicon_topic in topics, "No vicon groundtruth robot location data found in rosbag"
 
-    for robot in robot_names:
+    for robot in robot_id_map.keys():
         # separate ground truth, dead reckoning, and range measurments
-        gt_path = join(results_dir, trial_name+"_"+robot+"_GT.txt")
-        dr_path = join(results_dir, trial_name+"_"+robot+"_DR.txt")
+        gt_path = join(results_dir, trial_name+"_"+str(robot_id_map[robot])+"_GT.txt")
+        dr_path = join(results_dir, trial_name+"_"+str(robot_id_map[robot])+"_DR.txt")
 
         data_gt = open(gt_path, 'w')
         data_gt.write("timestamp(sec) x(m) y(m) theta(rad)\n")
@@ -210,7 +208,7 @@ def convert_results_to_plaza(data_dir, trial_name, robot_names):
         data_dr.close()
 
         start_pose_vicon = (x_start_vicon, y_start_vicon, heading_start_vicon)
-        drp_path = join(results_dir, trial_name+"_"+robot+"_DRp.txt")
+        drp_path = join(results_dir, trial_name+"_"+str(robot_id_map[robot])+"_DRp.txt")
         write_drp_from_dr(dr_path, drp_path, start_pose_vicon, time_start)
 
 
@@ -226,8 +224,12 @@ if __name__ == "__main__":
 
     data_dir = "/home/thumman/Desktop/swarmbot-related/initial_experiment_rosbags"
 
-    robot_names = ["archimedes", "mrg1", "pythagoras", "grace", "mrg2"] #susan not included in the current experiment
-
+    robot_id_map = {"mrg1": 1,
+                    "mrg2": 2,
+                    "archimedes": 3,
+                    "pythagoras": 4,
+                    "grace": 5}
+                    # "susan": 6}
     trials = get_trial_names(data_dir)
     for trial_name in trials:
 
@@ -236,4 +238,4 @@ if __name__ == "__main__":
             mkdir(results_dir)
 
         if not results_are_converted(data_dir, trial_name):
-            convert_results_to_plaza(data_dir, trial_name, robot_names)
+            convert_results_to_plaza(data_dir, trial_name, robot_id_map)
