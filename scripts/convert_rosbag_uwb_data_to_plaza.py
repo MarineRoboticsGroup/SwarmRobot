@@ -16,10 +16,8 @@ def measurement_is_valid_uwb(topic, msg):
     Returns:
         [type]: [description]
     """
-    data = msg.uwb
-    dist = float(data.dist)/1000
 
-    return "/uwb_msg" in topic and dist > eps
+    return "/uwb_msg" in topic and (msg.uwb.dist/1000) > eps
 
 
 def get_uwb_topic_namespace(topic):
@@ -220,9 +218,9 @@ if __name__ == "__main__":
     """
 
     # dataset information
-    uwb_bag_path = "/home/thumman/Desktop/swarmbot-related/initial_experiment_rosbags/uwb_msg_test.bag"
+    uwb_bag_path = "/home/thumman/data_pipeline/1_initial/vicon_swarm_test_experiment.bag"
     output_format = "plaza"
-    output_file_path = "/home/thumman/Desktop/swarmbot-related/initial_experiment_rosbags/output.txt"
+    output_file_path = "/home/thumman/data_pipeline/2_plaza_format/uwb.txt"
 
     # uwb configuration information
     robot_id_map = {"mrg1": 1,
@@ -231,19 +229,17 @@ if __name__ == "__main__":
                     "pythagoras": 4,
                     "grace": 5,
                     "susan": 6}
-    robots_with_tags = {"mrg1", "archimedes", "pythagoras", "susan"}
+    robots_with_tags = {"mrg1", "archimedes", "pythagoras"}
     uwb_addr_name_map = {"2ed5": "mrg2",
                          "2f50": "pythagoras",
                          "2faa": "grace",
-                         "2fab": "susan",
                          "c50": "mrg1",
                          "2eb2": "mrg2",
                          "2f95": "pythagoras",
                          "971f": "grace",
                          "9631": "mrg2",
                          "9838": "archimedes",
-                         "8583": "pythagoras",
-                         "2f68": "grace"}
+                         "2f68": "grace"} #"8583": "pythagoras",
 
     # get list of range measurement tuples
     # tuple format (timestamp, robot_id1, robot_id2, distance)

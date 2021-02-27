@@ -33,7 +33,7 @@ def get_trial_names(dir_path):
     return trial_names
 
 
-def results_are_converted(data_dir, trial_name):
+def results_are_converted(results_dir, trial_name):
     """checks to see if the desired conversion files have all already been
     generated
 
@@ -44,9 +44,9 @@ def results_are_converted(data_dir, trial_name):
     Returns:
         boolean: true if there exist the corresponding plaza format
     """
-    results_dir = join(data_dir, trial_name)
+    trial_dir = join(results_dir, trial_name)
     file_extensions = ["_GT.txt", "_DR.txt", "_DRp.txt"] #ground truth, odometry, dead reckoning
-    file_base = join(results_dir, trial_name)
+    file_base = join(trial_dir, trial_name)
     for ext in file_extensions:
         file_path = file_base + ext
         if not isfile(file_path):
@@ -77,7 +77,7 @@ def odometry_from_wheel_velocity(right_vel, left_vel, delta_t):
     return d_x, d_theta
 
 
-def convert_results_to_plaza(data_dir, trial_name, robot_id_map):
+def convert_results_to_plaza(data_dir, results_dir, trial_name, robot_id_map):
     """Converts from rosbag to same format as the plaza dataset
 
     # % GT: Groundtruth path from GPS
@@ -122,7 +122,7 @@ def convert_results_to_plaza(data_dir, trial_name, robot_id_map):
         data_dr.close()
 
     # merge save / read input bag
-    results_dir = join(data_dir, trial_name)
+    trial_dir = join(results_dir, trial_name)
 
     merged_bag_path = join(data_dir, trial_name+".bag")
     merged_bag = rosbag.Bag(merged_bag_path)
@@ -139,8 +139,8 @@ def convert_results_to_plaza(data_dir, trial_name, robot_id_map):
 
     for robot in robot_id_map.keys():
         # separate ground truth, dead reckoning, and range measurments
-        gt_path = join(results_dir, trial_name+"_"+str(robot_id_map[robot])+"_GT.txt")
-        dr_path = join(results_dir, trial_name+"_"+str(robot_id_map[robot])+"_DR.txt")
+        gt_path = join(trial_dir, trial_name+"_"+str(robot_id_map[robot])+"_GT.txt")
+        dr_path = join(trial_dir, trial_name+"_"+str(robot_id_map[robot])+"_DR.txt")
 
         data_gt = open(gt_path, 'w')
         data_gt.write("timestamp(sec) x(m) y(m) theta(rad)\n")
@@ -208,7 +208,7 @@ def convert_results_to_plaza(data_dir, trial_name, robot_id_map):
         data_dr.close()
 
         start_pose_vicon = (x_start_vicon, y_start_vicon, heading_start_vicon)
-        drp_path = join(results_dir, trial_name+"_"+str(robot_id_map[robot])+"_DRp.txt")
+        drp_path = join(trial_dir, trial_name+"_"+str(robot_id_map[robot])+"_DRp.txt")
         write_drp_from_dr(dr_path, drp_path, start_pose_vicon, time_start)
 
 
@@ -222,7 +222,8 @@ if __name__ == "__main__":
     that there are rosbags for each data collection trial.
     """
 
-    data_dir = "/home/thumman/Desktop/swarmbot-related/initial_experiment_rosbags"
+    data_dir = "/home/thumman/data_pipeline/1_initial"
+    results_dir = "/home/thumman/data_pipeline/2_plaza_format"
 
     robot_id_map = {"mrg1": 1,
                     "mrg2": 2,
@@ -233,9 +234,9 @@ if __name__ == "__main__":
     trials = get_trial_names(data_dir)
     for trial_name in trials:
 
-        results_dir = join(data_dir, trial_name)
-        if not isdir(results_dir):
-            mkdir(results_dir)
+        trial_dir = join(results_dir, trial_name)
+        if not isdir(trial_dir):
+            mkdir(trial_dir)
 
-        if not results_are_converted(data_dir, trial_name):
-            convert_results_to_plaza(data_dir, trial_name, robot_id_map)
+        if not results_are_converted(results_dir, trial_name):
+            convert_results_to_plaza(data_dir, results_dir, trial_name, robot_id_map)
