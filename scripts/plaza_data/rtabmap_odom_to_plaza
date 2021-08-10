@@ -1,0 +1,156 @@
+import rosbag
+import rospy
+from std_msgs.msg import Int32, String
+from os import listdir, mkdir
+from os.path import isfile, isdir, join
+import matplotlib.pyplot as plt
+import math
+from numpy import median
+import numpy as np
+import json
+import re
+import scipy
+from scipy.spatial.transform import Rotation as R
+try:
+    import queue
+except ImportError:
+    import Queue as queue
+
+
+def get_trial_names(dir_path):
+    """Gets all of the different trial names inside the given directory. The
+    directory this should be used on is the root directory of all of the
+    collected data. This assumes that every intended "trial" file is a rosbag
+
+    Args:
+        dir_path (str): the directory holding all of the trial data
+
+    Returns:
+        set: all found trialnames
+    """
+
+    def get_trial_from_filename(filename):
+        end_index = filename.find(".bag")
+        if end_index < 0:
+            assert False, filename+" is not the specified format (.bag)"
+        trial_name = filename[:end_index]
+        return trial_name
+
+    file_names = [f for f in listdir(dir_path) if isfile(join(dir_path, f))]
+    trial_names = set([get_trial_from_filename(x) for x in file_names])
+    return trial_names
+
+def results_are_converted(results_dir, trial_name):
+    """checks to see if the desired conversion files have all already been
+    generated
+
+    Args:
+        data_dir (str): the directory holding all of the trial data
+        trial_name (str): name of the current trial
+
+    Returns:
+        boolean: true if there exist the corresponding plaza format
+    """
+    trial_dir = join(results_dir, trial_name)
+    file_extensions = ["_DR.txt", "_DRp.txt"]
+    file_base = join(trial_dir, trial_name)
+    for ext in file_extensions:
+        file_path = file_base + ext
+        if not isfile(file_path):
+            print("Converting {} to Plaza format".format(trial_name))
+            return False
+
+    print("{} already converted to Plaza format".format(trial_name))
+    return True
+
+def convert_results_to_plaza(data_dir, trial_dir, trial_name, robot_id_map):
+    """Converts from rosbag to same format as the plaza dataset
+
+    # % DR: Odometry Input (delta distance traveled and delta heading change) DR -> GT for now
+    # %    Time (sec)    Delta Dist. Trav. (m)    Delta Heading (rad)
+    # % DRp: Dead Reckoned Path from Odometry
+    # %    Time (sec)    X_pose (m)    Y_pose (m)    Heading (rad)
+
+    Args:
+        data_dir (str): base directory where the data is held
+        trial_name (str): name of the  trial
+
+    """
+
+    bag_path = data_dir+"/"+trial_name+".bag"
+    bag = rosbag.Bag(bag_path)
+    
+    for robot in robot_id_map.keys():
+        
+        dr_path = join(trial_dir, trial_name+"_"+str(robot_id_map[robot])+"_DR.txt")
+        drp_path = join(trial_dir, trial_name+"_"+str(robot_id_map[robot])+"_DRp.txt")
+
+        data_dr = open(dr_path, 'w')
+        data_dr.write("timestamp(sec) d_x(m) d_theta(rad)\n")
+
+        data_drp = open(drp_path, 'w')
+        data_drp.write("timestamp(sec) x(m) y(m) theta(rad)\n")
+
+        time_start = None
+
+        def odometry_from_rs_data(msg):
+                x = msg.pose.pose.position.x
+                y = msg.pose.pose.position.y
+               
+                d_pos = math.sqrt(x**2 + y**2)
+
+                return d_pos
+        
+        for topic, msg, t in bag.read_messages():
+            if time_start is None:
+                time = t.to_sec()
+                        
+            if topic == "rtabmap/odom":
+            
+                d_pos = odometry_from_rs_data(msg)
+
+                rotation = msg.pose.pose.orientation
+                x_rot = rotation.x
+                y_rot = rotation.y
+                z_rot = rotation.z
+                w_rot = rotation.w
+
+                r = R.from_quat([x_rot, y_rot, z_rot, w_rot])
+                delta_heading = r.as_rotvec()[2]
+
+                x = msg.pose.pose.position.x
+                y = msg.pose.pose.position.y
+                time = t.to_sec()
+
+                data_dr.write('{} {} {}\n'.format(time, d_pos, delta_heading))
+                data_drp.write('{} {} {} {}\n'.format(
+                time, x, y, delta_heading))
+
+    data_dr.close() 
+    data_drp.close() 
+
+
+if __name__ == "__main__":
+    """ Looks through directory specified and converts the rosbag to the
+    same format as the Plaza dataset for only the realsense odometry data.
+
+    Resulting files are saved in a subdiractory with the original file's name
+
+    To run just specify the directory in which bag files are held and make sure
+    that there are rosbags for each data collection trial.
+    """
+
+    data_dir = "/home/sophia/data_pipeline/1_initial"
+    results_dir = "/home/sophia/data_pipeline/2_plaza_format"
+
+    robot_id_map = {"laptop": 1}
+    trials = get_trial_names(data_dir)
+    
+    for trial_name in trials:
+
+        trial_dir = join(results_dir, trial_name)
+        if not isdir(trial_dir):
+            mkdir(trial_dir)
+
+        if not results_are_converted(results_dir, trial_name):
+            convert_results_to_plaza(data_dir, trial_dir, trial_name, robot_id_map)
