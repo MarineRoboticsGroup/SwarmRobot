@@ -12,6 +12,7 @@ Received 0 bytes, expected 7 bytes, timed out in 1000 ms
 The symlinks created for the UWB and LiDAR aren’t initialized, so the initial problem of dynamic USB-ID naming has incorrectly assigned the two devices
 Refer to the **Guide to Configuring Indistinct USB/UART Conflicts** documentation
 
+
 ## RealSense Setting Configurations:
 ---
 ### Error Message:
@@ -21,6 +22,7 @@ No RGB data found
 ### Solution:
 The main RealSense launch file, rs_camera.launch, hasn’t been configured with correct gyro/accel and infra1/infra2 settings
 Refer to the **Setting Up Complete RTABMap System on the SwarmRobots** documentation
+
 
 ## Robot Roslaunch Frozen Commands:
 ---
@@ -32,14 +34,16 @@ Output only when quitting via “Ctrl-C”
 The ROS_IP and ROS_MASTER_URI likely haven’t been set to the IP address of the current wifi network
 Using ifconfig and sudo nano ~/.bashrc, configure the respective IP settings and source the changes using source ~/.bashrc or simply closing and reopening the terminal
 
+
 ## Running Roslaunch and Python Library Not Found:
 ---
 ### Error Message:
-<Python library name> not found
+Python library name not found
 
 ### Solution:
 Anaconda and its respective python versions and shells conflict with certain programs and roslaunch commands
 Quit the terminal Anaconda session with conda deactivate
+
 
 ## No Odometry Data Available:
 ---
@@ -52,6 +56,7 @@ RTABMap occasionally loses odometry in the data collection process, as its RGB-d
 This situation can be confirmed by playing the rosbag back and showing the collected odometry measurements through rostopic echo /rtabmap/odom
 If the messages are all zero values, then redo the rosbag recording with more attention to the recording methods
 
+
 ## Unable to Download Certain Packages (Ubuntu):
 ---
 ### Error Message:
@@ -63,6 +68,7 @@ Some packages from certain repositories are blocked from installing on the compu
 This can often be solved by disabling Secure Boot within BIOS Boot Configuration settings
 If the above step doesn’t solve it, make sure the sources.list file in /etc/apt directory is updated to a current file version
 
+
 ## Zero-Value Odometry to Plaza Format Data:
 ---
 ### Error Message:
@@ -71,6 +77,7 @@ ValueError: Found zero norm quaternions in `quat`.
 ### Solution:
 This error comes up in the post-processing stage, where when converting from rtabmap/odometry format to plaza format, the quaternion transform is unable to work with zero-valued data
 There’s a method written into the format conversion program that should skip these values, which still maintains the majority of the data due to minimal zero values (eg. 1-2 zeros in a medium dataset)
+
 
 ## Unable to Install pyGTK:
 ---
@@ -81,6 +88,7 @@ pyGTK stuck on dependencies that are unable to be resolved
 ### Solution:
 sudo apt install python-gtk2 python-gtk2-dev
 Reference (https://itsfoss.community/t/solved-pygtk-installation/2781)
+
 
 ## Unable to Install LCM:
 ---
@@ -98,6 +106,7 @@ Make sure all required dependencies are installed and built (build-essential, li
 echo $LCM_LIBRARY_DIR > /etc/ld.so.conf.d/lcm.conf
 Reference (https://lcm-proj.github.io/build_instructions.html)
 
+
 ## Realsense Data Overflow:
 ---
 ### Error Message:
@@ -108,6 +117,7 @@ This error usually occurs when the USB-C to USB-A cable is rated 2.0 as opposed 
 By switching out the cable for a 3.0 lightning cable, the overflow is contained 
 Verify that the USB port is also powered, and that the RealSense is detected with rs-enumerate-devices
 If the camera is not found, unplug and replug the camera. realsense-viewer is also built into the SDK for debugging and verification purposes
+
 
 ## Python Version Conflicts:
 ---
@@ -128,6 +138,7 @@ Anaconda is also built with Python3, so it’s important to be aware of the curr
 ### Solution:
 This error can come up if RealSense software hasn’t been properly installed. Whether the binary or SDK haven’t been installed or built correctly, or certain packages and dependencies are broken, this situation is often fixed by complete reinstall of all RealSense software
 Refer to the **RTABMap Set-up** documentation on setting up all required RealSense software successfully
+
 
 ## RTABMap Process Dies After Start-Up:
 ---
