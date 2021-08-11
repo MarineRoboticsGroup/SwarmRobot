@@ -25,8 +25,8 @@ Refer to the **Setting Up Complete RTABMap System on the SwarmRobots** documenta
 ## Robot Roslaunch Frozen Commands:
 ---
 ### Error Message:
-	Terminal freezing upon roslaunch command
-	Output only when quitting via “Ctrl-C”
+Terminal freezing upon roslaunch command
+Output only when quitting via “Ctrl-C”
 
 ### Solution:
 The ROS_IP and ROS_MASTER_URI likely haven’t been set to the IP address of the current wifi network
@@ -35,7 +35,7 @@ Using ifconfig and sudo nano ~/.bashrc, configure the respective IP settings and
 ## Running Roslaunch and Python Library Not Found:
 ---
 ### Error Message:
-		<Python library name> not found
+<Python library name> not found
 
 ### Solution:
 Anaconda and its respective python versions and shells conflict with certain programs and roslaunch commands
@@ -44,7 +44,7 @@ Quit the terminal Anaconda session with conda deactivate
 ## No Odometry Data Available:
 ---
 ### Error Message:
-	E: Did not receive data since 5 seconds! 
+E: Did not receive data since 5 seconds! 
 
 ### Solution:
 When analyzing a rosbag of recorded RTABMap data, there may appear to be zero odometry readings collected
@@ -66,7 +66,7 @@ If the above step doesn’t solve it, make sure the sources.list file in /etc/ap
 ## Zero-Value Odometry to Plaza Format Data:
 ---
 ### Error Message:
-"ValueError: Found zero norm quaternions in `quat`."" 
+ValueError: Found zero norm quaternions in `quat`.
 
 ### Solution:
 This error comes up in the post-processing stage, where when converting from rtabmap/odometry format to plaza format, the quaternion transform is unable to work with zero-valued data
@@ -75,8 +75,8 @@ There’s a method written into the format conversion program that should skip t
 ## Unable to Install pyGTK:
 ---
 ### Error Message:
-	E: Unable to locate package pygtk
-	pyGTK stuck on dependencies that are unable to be resolved
+E: Unable to locate package pygtk
+pyGTK stuck on dependencies that are unable to be resolved
 	
 ### Solution:
 sudo apt install python-gtk2 python-gtk2-dev
@@ -85,7 +85,7 @@ Reference (https://itsfoss.community/t/solved-pygtk-installation/2781)
 ## Unable to Install LCM:
 ---
 ### Error Message:
-	Unable to build LCM from source
+Unable to build LCM from source
 
 ### Solution:
 git clone https://github.com/lcm-proj/lcm.git
@@ -112,7 +112,7 @@ If the camera is not found, unplug and replug the camera. realsense-viewer is al
 ## Python Version Conflicts:
 ---
 ### Error Message:
-	ImportError: dynamic module does not define init function (PyInit__tf2)
+ImportError: dynamic module does not define init function (PyInit__tf2)
 
 ### Solution:
 If there are multiple versions of python running in the same environment, conflicts between version-based packages arise when running certain programs
