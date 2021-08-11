@@ -5,7 +5,7 @@
 ## This write-up is designed with a master computer and one or more swarm robots in mind, however, it can be modified depending on the situation. From configuring the master-agent relationships between the robots, to replaying a ROSBag to visualize the collected data, these steps go through the full set-up process.
 
 1. The master computer and agent robot networks must be configured properly in the bashrc file before any other software is downloaded.
-⋅⋅1. sudo nano ~/.bashrc
+  1. sudo nano ~/.bashrc
 ⋅⋅2. ctrl-end
 ⋅⋅3. Verify “export ROS_IP=<insert IP address here> matches” the computer’s IP address under wlp0 when running ifconfig
 ⋅⋅4. Change export ROS_MASTER_URI=http://<insert IP address here>:11311 to the IP address of the master computer
