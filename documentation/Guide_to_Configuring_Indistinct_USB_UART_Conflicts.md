@@ -5,11 +5,11 @@
 ### Our solution to this common issue is long-lasting and robust, where we utilize the chip’s software platform to modify a particular setting to differentiate between two devices, an RPLIDAR A1M8 with a Decawave DM1001 board. This unique setting can be implemented as the modified device’s ID, which can be configured to route the USB assignment, resulting in a functioning and unique computer system.
 ---
 1. Download Simplicity Studios (version 5) from Silicon Labs onto a machine running Windows
-        1. Windows is required, as Ubuntu build isn’t fully set-up, and several crucial functions for modifying USB/UART device IDs aren’t available as a result
-        2. Both version 4 and 5 are available, however, only version 5 offers the necessary ID information access 
+    1. Windows is required, as Ubuntu build isn’t fully set-up, and several crucial functions for modifying USB/UART device IDs aren’t available as a result
+    2. Both version 4 and 5 are available, however, only version 5 offers the necessary ID information access 
 2. After setting up an account on Simplicity Studios, connect the device through USB that’s going to be modified
-        1. It should show up in “Connected Devices” with its identifying information (including serial number, which we will be changing)
-        2. Press Start -> Create New Project -> Xpress Configuration Project
+    1. It should show up in “Connected Devices” with its identifying information (including serial number, which we will be changing)
+    2. Press Start -> Create New Project -> Xpress Configuration Project
 3. The new project, which consists of the device’s current information, has unset fields for IDs including: vendor ID, product ID, manufacturer string, product string, and serial string
     1. Changing the VID (vendor ID) or PID (product ID) is discouraged, so it’s best to change the serial string for dependable identification
         1. The serial string is listed as “an optional string that is used by the host to distinguish between devices with the same VID and PID combination”
