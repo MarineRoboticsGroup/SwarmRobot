@@ -32,7 +32,7 @@ Output only when quitting via “Ctrl-C”
 
 ### Solution:
 The ROS_IP and ROS_MASTER_URI likely haven’t been set to the IP address of the current wifi network
-Using ifconfig and sudo nano ~/.bashrc, configure the respective IP settings and source the changes using source ~/.bashrc or simply closing and reopening the terminal
+Using ifconfig and sudo nano ~/.bashrc, configure the respective IP settings and source the changes using source ` ~/.bashrc` or simply closing and reopening the terminal
 
 
 ## Running Roslaunch and Python Library Not Found:
@@ -53,7 +53,7 @@ E: Did not receive data since 5 seconds!
 ### Solution:
 When analyzing a rosbag of recorded RTABMap data, there may appear to be zero odometry readings collected
 RTABMap occasionally loses odometry in the data collection process, as its RGB-depth pointcloud projection can be broken if the camera is moved too quickly or sharply
-This situation can be confirmed by playing the rosbag back and showing the collected odometry measurements through rostopic echo /rtabmap/odom
+This situation can be confirmed by playing the rosbag back and showing the collected odometry measurements through ` rostopic echo /rtabmap/odom` 
 If the messages are all zero values, then redo the rosbag recording with more attention to the recording methods
 
 
@@ -86,7 +86,7 @@ E: Unable to locate package pygtk
 pyGTK stuck on dependencies that are unable to be resolved
 	
 ### Solution:
-sudo apt install python-gtk2 python-gtk2-dev
+` sudo apt install python-gtk2 python-gtk2-dev` 
 Reference (https://itsfoss.community/t/solved-pygtk-installation/2781)
 
 
@@ -96,7 +96,7 @@ Reference (https://itsfoss.community/t/solved-pygtk-installation/2781)
 Unable to build LCM from source
 
 ### Solution:
-git clone https://github.com/lcm-proj/lcm.git
+` git clone https://github.com/lcm-proj/lcm.git
 cd lcm
 mkdir build && cd build
 cmake ..
@@ -104,7 +104,7 @@ make -j2
 sudo make install
 Make sure all required dependencies are installed and built (build-essential, libglib2.0-dev, cmake)
 echo $LCM_LIBRARY_DIR > /etc/ld.so.conf.d/lcm.conf
-Reference (https://lcm-proj.github.io/build_instructions.html)
+Reference (https://lcm-proj.github.io/build_instructions.html)` 
 
 
 ## Realsense Data Overflow:
@@ -148,5 +148,5 @@ Process has died [pid 6785, exit code -6, cmd /opt/ros/noetic/lib/rtabmap_ros/rg
 ### Solution:
 While this error can come up for several different reasons, one of the Swarm Robots encountered exit code -6 because of a set-up error resulting from multiple versions of OpenCV
 Both OpenCV 4.5 and OpenCV 3.2 were running in the same Ubuntu environment, causing RTABMap to die after the launch file was called through roslaunch
-Running the command “find / 2>/dev/null | grep libopencv | egrep "4.5|3.2" | grep ".so" | more” can clarify if two versions of OpenCV are floating around 
+Running the command ` find / 2>/dev/null | grep libopencv | egrep "4.5|3.2" | grep ".so" | more`  can clarify if two versions of OpenCV are floating around 
 If this is the case, remove the unnecessary system (which can be determined depending on the build versions of reliant software)
