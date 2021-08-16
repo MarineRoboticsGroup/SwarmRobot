@@ -26,10 +26,10 @@
         3. Repeat these edits with the required format for each device
 8. Save and transfer these edits with the command “sudo udevadm control --reload-rules && udevadm trigger”
 9. Unplug all of the devices, then plug them back in again
-    1. To verify the process, the UWB and RPLiDAR symlinks /dev/usb and /dev/rplidar should both be visible with “ls /dev/uwb /dev/rplidar”
-    2. UWBs can occasionally be defective - if the UWB symlink is missing, make sure the USB port can see the device with udevadm info --attribute-walk --path=/sys/bus/usb-serial/devices/ttyUSBn where n is bus 0,1, or 2
-10. Replace all of the /dev/ttyUSB0 paths with /dev/rplidar for corresponding rplidar files (these were default paths initialized with the devices)
-    1. All of the files to be edited are in ~/catkin_ws/src/rplidar_ros/launch
-    2. Access all files for easy editing with “code .”, which opens vscode editor
-11. Save these edits and recompile the system by running “cmake .. ; make -j” in ~/catkin_ws/src/rplidar_ros/launch
+    1. To verify the process, the UWB and RPLiDAR symlinks /dev/usb and /dev/rplidar should both be visible with ` ls /dev/uwb /dev/rplidar` 
+    2. UWBs can occasionally be defective - if the UWB symlink is missing, make sure the USB port can see the device with ` udevadm info --attribute-walk --path=/sys/bus/usb-serial/devices/ttyUSBn`  where n is bus 0,1, or 2
+10. Replace all of the ` /dev/ttyUSB0`  paths with ` /dev/rplidar`  for corresponding rplidar files (these were default paths initialized with the devices)
+    1. All of the files to be edited are in ` ~/catkin_ws/src/rplidar_ros/launch` 
+    2. Access all files for easy editing with ` code .` , which opens vscode editor
+11. Save these edits and recompile the system by running ` cmake .. ; make -j`  in ` ~/catkin_ws/src/rplidar_ros/launch` 
 12. The UWB/RPLiDAR configurations can be verified by running roslaunch rplidar_ros rplidar.launch and roslaunch uwb_slam_ros uwb_node.launch
