@@ -25,8 +25,9 @@
     1. On each robot, attach a monitor + keyboard + mouse (preferably Bluetooth for ease of access)
         1. Alternatively, ssh into each robot once it's powered on through the master computer (eg. the main laptop). ssh <robot name>@<ip address> for headless set-up
     3. For each robot agent, type in `rosrun procman_ros deputy`
-    4. `cd ~/catkin_ws/src/procman_ros/test` (where the Procman-ROS launch file script should be written)
-    5. For the master computer, type in `rosrun procman_ros sheriff swarm_manager_3robot.cfg` as well as `rosrun procman_ros deputy`
+    4. Launch `roscore`
+    5. `cd ~/catkin_ws/src/procman_ros/test` (where the Procman-ROS launch file script should be written)
+    6. For the master computer, type in `rosrun procman_ros sheriff swarm_manager_3robot.cfg` as well as `rosrun procman_ros deputy`
         1. If the master computer is running anaconda, run `conda deactivate` to avoid python conflicts
 4. With Procman-ROS configured on each respective robot and the master robot, data collection can begin with several commands.
     1. Each robot should be visible in the Procman-ROS GUI up on the master robot
