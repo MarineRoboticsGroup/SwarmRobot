@@ -1,4 +1,4 @@
-# Steps for Collecting Data from a Multi-Robot Set-up
+# Steps for Collecting Data from a Single or Multi-Robot Set-up
 ---
 ### The SwarmRobots have been configured with a complete platform for both controlling and collecting data from the various on-board sensors and software. While there are many ways of running the robot’s programs, the optimal set-up is through the ROS binary for Procman. Procman-ROS is a platform for managing many programs on several computers at once, which can be used to control each function and sensor of the SwarmBots. 
 
