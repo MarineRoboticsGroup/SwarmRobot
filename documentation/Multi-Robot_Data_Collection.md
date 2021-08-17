@@ -9,7 +9,7 @@
     2. `ctrl-end`
     3. Verify `export ROS_IP=<insert IP address here>` matches the computer’s IP address under wlp0 when running ifconfig
     4. Change `export ROS_MASTER_URI=http://<insert IP address here>:11311` to the IP address of the master computer
-2. Download Procman-ROS on each of the robots and the master computer.
+2. Download Procman-ROS on each of the robots and the master computer if not already installed.
     1. Procman-ROS depends on LCM, python2, and PyGTK
         1. LCM can be built from source through this link
         2. `sudo apt install python-minimal`
@@ -24,13 +24,14 @@
 3. Assuming that the required software for each device is installed and built, and each robot’s devices are connected, Procman-ROS can be fired up.
     1. On each robot, attach a monitor + keyboard + mouse (preferably Bluetooth for ease of access)
     2. For each robot agent, type in `rosrun procman_ros deputy`
-    3. `cd ~/catkin_ws/src/procman_ros/test` (where the Procman-ROS launch file script should be written
+    3. `cd ~/catkin_ws/src/procman_ros/test` (where the Procman-ROS launch file script should be written)
     4. For the master computer, type in `rosrun procman_ros sheriff swarm_manager_3robot.cfg` as well as `rosrun procman_ros deputy`
     5. If the master computer is running anaconda, run `conda deactivate` to avoid python conflicts
 4. With Procman-ROS configured on each respective robot and the master robot, data collection can begin with several commands.
     1. Each robot should be visible in the Procman-ROS GUI up on the master robot
-    2. Start all processes/devices required for data collection
+    2. Start all processes/devices required for data collection on all running robots
     3. In a separate terminal, record a rosbag
+        1. The standard Swarm Robot rosbag is recorded via `rosbag record tf rtabmap/odom susan/uwb_msg tf_static camera/color/image_raw/compressed rtabmap/mapPath rtabmap/mapGraph susan/laser` using Susan, for example
     4. The information recorded in the rosbag can either be all published topics with `-a` or the specific topics listed after `rosbag record`
         1. Examples of recorded topics: rtabmap/odom, <robot name>/laser, <robot name>/uwb, tf, tf_static, camera/compressed etc
         2. The rosbag will save to whichever location the command is run in
