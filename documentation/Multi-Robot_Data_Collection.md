@@ -23,10 +23,11 @@
     8. `sudo make install`
 3. Assuming that the required software for each device is installed and built, and each robot’s devices are connected, Procman-ROS can be fired up.
     1. On each robot, attach a monitor + keyboard + mouse (preferably Bluetooth for ease of access)
-    2. For each robot agent, type in `rosrun procman_ros deputy`
-    3. `cd ~/catkin_ws/src/procman_ros/test` (where the Procman-ROS launch file script should be written)
-    4. For the master computer, type in `rosrun procman_ros sheriff swarm_manager_3robot.cfg` as well as `rosrun procman_ros deputy`
-    5. If the master computer is running anaconda, run `conda deactivate` to avoid python conflicts
+        1. Alternatively, ssh into each robot through the master computer (eg. the main laptop). ssh <robot name>@<ip address> for headless set-up
+    3. For each robot agent, type in `rosrun procman_ros deputy`
+    4. `cd ~/catkin_ws/src/procman_ros/test` (where the Procman-ROS launch file script should be written)
+    5. For the master computer, type in `rosrun procman_ros sheriff swarm_manager_3robot.cfg` as well as `rosrun procman_ros deputy`
+    6. If the master computer is running anaconda, run `conda deactivate` to avoid python conflicts
 4. With Procman-ROS configured on each respective robot and the master robot, data collection can begin with several commands.
     1. Each robot should be visible in the Procman-ROS GUI up on the master robot
     2. Start all processes/devices required for data collection on all running robots
@@ -39,5 +40,6 @@
 4. Once a satisfactory dataset has been recorded, its output can be analyzed with Rviz. 
     1. Play back the recorded rosbag, to simulate real-time data collection, with rosbag play <name of recorded rosbag>
     2. Simultaneously, launch `rviz`
+        1. rviz will only display the rosbag's data if all running processes through Procman-ROS are stopped completely
     3. Add in all topics to be visualized through the broadcasted topics option
     4. Repeat steps as needed to go through different subsets of data from the robot’s collected information
