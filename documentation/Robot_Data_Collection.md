@@ -11,7 +11,7 @@
     4. Change `export ROS_MASTER_URI=http://<insert IP address here>:11311` to the IP address of the master computer
 2. Download Procman-ROS on each of the robots and the master computer if not already installed.
     1. Procman-ROS depends on LCM, python2, and PyGTK
-        1. LCM can be built from source through this [link](https://lcm-proj.github.io/build_instructions.html)
+        1. LCM can be built from source through the github repository [link](https://lcm-proj.github.io/build_instructions.html)
         2. `sudo apt install python-minimal`
         3. `sudo apt install python-gtk2`
     2. `cd ~/catkin_ws/src`
@@ -20,9 +20,11 @@
     5. `mkdir build && cd build`
     6. `cmake ..`
     7. `make -j4`
-    8. `sudo make install`
+    8. `catkin build``
+    9. `source devel/setup.bash`
 3. Assuming that the required software for each device is installed and built, and each robot’s devices are connected, Procman-ROS can be fired up.
-    1. On each robot, attach a monitor + keyboard + mouse (preferably Bluetooth for ease of access)
+    1. Verify that the Joy ROS package is installed and running on the robot to be teleoperated. If not, `sudo apt-get install ros-melodic-joy`
+    2. On each robot, attach a monitor + keyboard + mouse (preferably Bluetooth for ease of access)
         1. Alternatively, ssh into each robot once it's powered on through the master computer (eg. the main laptop). ssh <robot name>@<ip address> for headless set-up
     3. For each robot agent, type in `rosrun procman_ros deputy`
     4. Launch `roscore`
