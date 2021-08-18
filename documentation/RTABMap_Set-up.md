@@ -15,14 +15,15 @@
     1. `sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'`
     2. `curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -`
     3. `sudo apt update`
-    4. `sudo apt upgrade`
-    5. `sudo apt install ros-melodic-desktop-full`
-    6. `echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc`
-    7. `source ~/.bashrc`
-    8. `sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential`
-    9. `sudo apt install python-rosdep`
-    10. `sudo rosdep init`
-    11. `rosdep update`
+        1. If the robot is unable to update, upgrade, or later on, install select applications, see "Common Bugs and Solutions for the Swarm Robots" under "Unable to Download Certain Packages (Ubuntu)".
+    5. `sudo apt upgrade`
+    6. `sudo apt install ros-melodic-desktop-full`
+    7. `echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc`
+    8. `source ~/.bashrc`
+    9. `sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential`
+    10. `sudo apt install python-rosdep`
+    11. `sudo rosdep init`
+    12. `rosdep update`
 4. Following the minimal install and set-up required to run SLAM via RTABMap on an Intel realsense D435i, there are several binaries to install before getting the system running
     1. `sudo apt-get install ros-melodic-realsense2-camera`
     2. `sudo apt-get install ros-melodic-imu-filter-madgwick`
@@ -33,9 +34,11 @@
     1. `cd ~/catkin_ws/src`
     2. `sudo apt-get install git libssl-dev libusb-1.0-0-dev pkg-config libgtk-3-dev`
     3. `git clone https://github.com/IntelRealSense/librealsense.git`
-    4. `cmake .`
-    5. `cd ../..`
-    6. `catkin build`
+    4. `mkdir build && cd build`
+    5. `cmake ../`
+    6. `sudo make uninstall && make clean && make && sudo make install`
+    7. `cd ../..`
+    8. `catkin build`
 6. Finally, the main RealSense launch file must be configured for odometry data, as it combines accelerometer and gyroscope readings to output odometry
     1. `cd /opt/ros/melodic/share/realsense2_camera/launch`
     2. `code .` (call for VSCode)
