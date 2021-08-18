@@ -1,4 +1,4 @@
-# Common Bugs and Solutions for the SwarmBots
+# Common Bugs and Solutions for the Swarm Robots
 
 ## UWB or LiDAR USB Conflicts:
 ---
