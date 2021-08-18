@@ -66,7 +66,7 @@ E: Unable to fetch some archives, maybe run apt-get update or try with --fix-mis
 ### Solution:
 Some packages from certain repositories are blocked from installing on the computers, depending on the initial settings of the ubuntu instance.
 This can often be solved by disabling Secure Boot within BIOS Boot Configuration settings.
-If the above step doesn’t solve it, make sure the sources.list file in /etc/apt directory is updated to a current file version.
+If the above step doesn’t solve it, make sure the sources.list file in /etc/apt directory is updated to a current file version. An example sourcse.list file is uploaded under 'Documentation' from one of the robots. Simply replace the sources.list file within its directory, and after sourcing the set-up and re-opening terminal, the computer should successfully install all software and updates.
 
 
 ## Zero-Value Odometry to Plaza Format Data:
