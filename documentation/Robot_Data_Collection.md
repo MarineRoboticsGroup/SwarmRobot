@@ -20,7 +20,7 @@
     5. `mkdir build && cd build`
     6. `cmake ..`
     7. `make -j4`
-    8. `catkin build``
+    8. `catkin build`
     9. `source devel/setup.bash`
 3. Assuming that the required software for each device is installed and built, and each robot’s devices are connected, Procman-ROS can be fired up.
     1. If the UWB runs into conflicts with the RPLiDAR, see "Guide to Configuring Indistinct USB/UART Conflicts"
